@@ -1,0 +1,30 @@
+
+import { mm } from './contentScript.js'
+
+
+/**
+ * connet to background service "serviceWorker.js"
+ */
+/**
+ * Check if a string contains Chinese characters.
+ * @param {String} s The string to be checked
+ * @return {Boolean} If the string contains at least one Chinese character,
+ * returns true. Otherwise returns false.
+ */
+export const hasHanChar = (s) => {
+    const r = /[〆〇一-鿿㐀-䶿𠀀-𪛟𪜀-𫜿𫝀-𫠟𫠠-𬺯𬺰-𮯯𰀀-𱍏]/u;
+    return Boolean(s.match(r));
+}
+
+
+/**
+ * 
+ * @param {string} s to be covert string. 
+ * @returns  array like this style: [['a','1'],['b','2'],['c','3'],...]
+ */
+export  const convertText = async (s) => {
+    // console.log('converting text:', s)
+    const conversionResults = await mm.sendMessageMM('convert', s);
+    // console.log(`convert ${s} to `, conversionResults)
+    return conversionResults
+}

@@ -1,0 +1,52 @@
+body {
+    margin: 0 4px;
+    padding: 0;
+    background-color: lightgray;
+}
+
+#bodyPartWrapper {
+    /* border-radius: 10px;  */
+    /* box-shadow: 0 2px 2px rgba(0,0,0,0.3); */
+}
+
+#container-xy {
+    background-color: blueviolet;
+}
+
+#my-container {
+    /* position: relative;/ */
+    /* background: rebeccapurple; */
+    /* width: 200px;
+    height: 130px; */
+    /* top: 0; */
+    /* position: sticky; */
+    /* z-index: 100 */
+
+    /* position: absolute; */
+}
+#mydialogid {
+    /* position: absolute;
+    background: greenyellow;
+    z-index: 2142147483647; */
+    /* font-size: medium; */
+}
+#jyutpingwonderful-container {
+
+}
+#buttons-container {
+    display: flex;
+    justify-content: space-around;
+    background: #000;
+    min-width: 100px;
+}
+
+.jyut {
+    font-size: medium;
+    margin-left: 4px;
+    margin-top: 6px;
+}
+
+.textforjyut {
+    margin-bottom: 4px;
+}
+

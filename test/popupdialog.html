@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Popup Over Selected Text</title>
+    <style>
+        .popup {
+            position: absolute;
+            background-color: white;
+            border: 1px solid black;
+            padding: 10px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <p id="para1">This is a paragraph. Try selecting this text with your mouse.</p>
+    <p id="para2">Here is another paragraph. Select some text here too.</p>
+
+    <script>
+        document.addEventListener('mouseup', function () {
+            let selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                let range = selection.getRangeAt(0);
+                let selectedElement = range.commonAncestorContainer;
+
+                // Ensure the selected element is an HTML element
+                if (selectedElement.nodeType === 3) { // Text node
+                    selectedElement = selectedElement.parentNode;
+                }
+
+                // Ensure the selected element has position: relative
+                selectedElement.style.position = 'relative';
+
+                // Create the popup element
+                let popup = document.createElement('div');
+                popup.className = 'popup';
+                popup.textContent = 'This is a popup!';
+                
+                // Append the popup to the selected element
+                selectedElement.appendChild(popup);
+
+                // Position the popup within the selected element
+                popup.style.top = '0';
+                popup.style.left = '0';
+            }
+        });
+
+        // Hide the popup when clicking elsewhere
+        document.addEventListener('click', function (event) {
+            let popups = document.querySelectorAll('.popup');
+            popups.forEach(popup => {
+                if (!popup.contains(event.target) && !event.target.classList.contains('popup')) {
+                    popup.remove();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
