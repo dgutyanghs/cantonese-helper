@@ -184,7 +184,7 @@ function Dialog() {
     return (
         <div id="jyutpingpopupdialogid">
             <Box onMouseUp={stopPassTheEvent} sx={modalStyle}>
-                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ mt: 2, color: 'black' }}>
+                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ mt: 2, color: 'black',fontSize: '1rem' }}>
                     {allText}
                 </Typography>
                 <hr />
