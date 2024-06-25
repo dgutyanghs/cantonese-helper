@@ -18,5 +18,5 @@ A handy tool to assist with learning and translating Cantonese by using Jyutping
    * By using this extension, you can easily select Chinese text on the web page and save it in your word list. you can also follow the TextToSpeech to practice your oral speaking.
 
 ### relative
-* this project in inspired by [inject-jyutping](https://github.com/CanCLID/inject-jyutping)
+* this project is inspired by [inject-jyutping](https://github.com/CanCLID/inject-jyutping)
 * make Cantonese great again.^_^
