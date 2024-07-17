@@ -4,8 +4,9 @@ let myspeaking = false
 export function splitChineseSentences(text) {
     console.log("text:",text);
     // const regex = /(?:[^。！？；，\)）"」』.!?,]+[\)）"」』]*[。！？；，.!?,]|[^。！？；，\)）"」』.!?,]+[\)）"」』]*$)/g; 
-    const regex = /(?:[^。！？；，\)）"」』!?,]+[\)）"」』]*[。！？；，!?,]|[^。！？；，\)）"」』!?,]+[\)）"」』]*$)/g; 
-    return text.match(regex) || [];
+    // const regex = /(?:[^。！？；，\)）"」』!?,]+[\)）"」』]*[。！？；，!?,]|[^。！？；，\)）"」』!?,]+[\)）"」』]*$)/g; 
+    // return text.match(regex) || [];
+    return text.match(/[^。！？；，]+[。！？；，]?/g) || []; 
   }
 
 
@@ -18,7 +19,7 @@ export function speakLongText(text) {
     function speakNextChunk(index) {
       if (index < chunks.length) {
         chrome.tts.speak(chunks[index].trim(), {
-          lang: 'zh-CN',
+          lang: 'zh-TW',
           rate: 1.2,
           pitch: 0.5,
           onEvent: function(event) {

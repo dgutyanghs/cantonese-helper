@@ -85,7 +85,7 @@ function Dialog() {
 
     const textStyle = {
         color: 'orange',
-        fontSize: '2.5rem',
+        fontSize: '2rem',
         textAlign: 'center',
         width: '100%',
         fontWeight: 'bold',
