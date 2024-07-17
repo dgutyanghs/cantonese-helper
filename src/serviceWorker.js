@@ -1,6 +1,6 @@
 import Trie from './Trie.js';
 import MessageManager from './MessageManager.js';
-import { speakLongText } from './ttsbg.js';
+import { speakLongText, stopSpeaking } from './ttsbg.js';
 
 /**
  * 轉換一個字串，取得字串中每個字及其讀音。
@@ -28,17 +28,17 @@ function convert(t, s) {
 
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "fetchTranslation") {
+    if (request.action === "TTSStartSpeaking") {
         let text = request.text;
         console.log("bg speak text:", text)
-        speakLongText(text);
-        // fetchTranslation(request.text).then(response => {
-        //     sendResponse({ result: response });
-        // }).catch(error => {
-        //     sendResponse({ error: error.message });
-        // });
-    }
-    return false; // Keep the message channel open for asynchronous sendResponse
+        let ret = speakLongText(text)
+        if (ret === true) {
+            sendResponse({ result: true });
+        }
+    } else if (request.action === "TTSStop") {
+        stopSpeaking()
+    } 
+    return true; // Keep the message channel open for asynchronous sendResponse
 });
 
 async function fetchTranslation(text) {

@@ -1,7 +1,10 @@
 
+let myspeaking = false
+
 export function splitChineseSentences(text) {
     console.log("text:",text);
-    const regex = /(?:[^。！？；，\)）"」』.!?,]+[\)）"」』]*[。！？；，.!?,]|[^。！？；，\)）"」』.!?,]+[\)）"」』]*$)/g; 
+    // const regex = /(?:[^。！？；，\)）"」』.!?,]+[\)）"」』]*[。！？；，.!?,]|[^。！？；，\)）"」』.!?,]+[\)）"」』]*$)/g; 
+    const regex = /(?:[^。！？；，\)）"」』!?,]+[\)）"」』]*[。！？；，!?,]|[^。！？；，\)）"」』!?,]+[\)）"」』]*$)/g; 
     return text.match(regex) || [];
   }
 
@@ -19,15 +22,29 @@ export function speakLongText(text) {
           rate: 1.2,
           pitch: 0.5,
           onEvent: function(event) {
-            console.log("speak next chunk, event:", event);
+            // console.log("speak next chunk, event:", event);
             if (event.type === 'end' || event.type === 'interrupted' || event.type === 'cancelled') {
-              speakNextChunk(index + 1);
+              if (myspeaking === true) {
+                speakNextChunk(index + 1);
+              }
             }
           }
         });
+      } else {
+        // speack finished
+        console.log(" speak finished, index=",index);
+        myspeaking = false;
+        return true;
       }
     }
     
+    myspeaking = true;
     speakNextChunk(0);
 }
   
+
+export function stopSpeaking() {
+    myspeaking = false;
+    chrome.tts.stop();
+    console.log("bg stop speaking!")
+}

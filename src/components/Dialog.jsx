@@ -6,6 +6,7 @@ import { nanoid } from 'nanoid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { IconButton } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
@@ -49,38 +50,52 @@ function Dialog() {
             ...oriStyle,
             display: 'none',
         };
+
+        chrome.runtime.sendMessage({ action: 'TTSStop', text: "" }, response => {
+            console.log('TTS stop speaking');
+        });
         setModalStyle(newStyle);
     };
     const handleOpen = pos => {
-        const newStyle = {
-            ...oriStyle,
-            top: `${pos.y}px`,
-            left: `${pos.x}px`,
-            display: 'block',
-        };
+        // const newStyle = {
+        //     ...oriStyle,
+        //     top: `${pos.y}px`,
+        //     left: `${pos.x}px`,
+        //     display: 'block',
+        // };
         const newStyle2 = {
             ...oriStyle,
-            // position: 'absolute',
-            // top: '50%',
-            // left: '50%',
-            // transform: 'translate(-50%, -50%)',
-            // width: 400,
-            bgcolor: theme => alpha(theme.palette.background.paper, 0.5), // This creates a half-transparent background
+            bgcolor: theme => alpha(theme.palette.background.paper, 0.7), // This creates a half-transparent background
             border: '2px solid #000',
             boxShadow: 24,
             p: 4,
             backdropFilter: 'blur(5px)', // This adds a blur effect to the background
-            top: `${pos.y}px`,
-            left: `${pos.x}px`,
-            display: 'block',
-            position: 'absolute',
-            top: '50%',
+            position: 'fixed',
+            top: '80%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: '75%', // Set width to 75%
+            width: '85%', // Set width to 75%
             maxWidth: '1200px', // Keep the previous max width
+            display: 'flex', // Add this
+            justifyContent: 'center', // Add this
+            alignItems: 'center', // Add this
         };
         setModalStyle(newStyle2);
+    };
+
+    const textStyle = {
+        color: 'orange',
+        fontSize: '2.5rem',
+        textAlign: 'center',
+        width: '100%',
+        fontWeight: 'bold',
+        textShadow: `
+            1px 1px 2px black,
+            0 0 1em lightblue,
+            0 0 0.2em lightblue;
+        `,
+        letterSpacing: '0.05em',
+        fontFamily: 'PingFang SC, Heiti SC, Microsoft YaHei, sans-serif',
     };
 
     React.useEffect(() => {
@@ -104,32 +119,16 @@ function Dialog() {
             switch (key) {
                 case 'selection':
                     let { x, y, text } = val;
-                    let { ctrlKey, altKey, shiftKey } = val;
-                    // console.log('selection, x,y', x, y);
-
-                    if (ctrlKey) {
-                        // console.log('ctl key pressed ', ctrlKey);
-                        keyForMousePressed = USER_SELECT_OPTION_KEY_CTL;
-                    } else if (altKey) {
-                        // console.log('alt key pressed', altKey);
-                        keyForMousePressed = USER_SELECT_OPTION_KEY_ALT;
-                    } else if (shiftKey) {
-                        // console.log('shift key pressed', shiftKey);
-                        keyForMousePressed = USER_SELECT_OPTION_KEY_SHIFT;
-                    }
-                    // Mouse + key must Follow the rule in Popup.html
-                    if (keyForMouseSelected.toString() != keyForMousePressed.toString()) {
-                        console.log(`${keyForMousePressed} not match ${keyForMouseSelected}, not show Dialog`);
-                        console.log(typeof keyForMousePressed, typeof keyForMouseSelected);
-                        return;
-                    }
+                    console.log('selection, x,y', x, y);
 
                     if (hasHanChar(text)) {
                         console.log('has Han character, call convertText', text);
 
                         // let result = await convertText(text);
                         // console.log(result);
-                        chrome.runtime.sendMessage({ action: 'fetchTranslation', text: text });
+                        chrome.runtime.sendMessage({ action: 'TTSStartSpeaking', text: text }, response => {
+                            console.log('in Dialog.jsx speak finished,response=', response);
+                        });
                         setAllText(text);
                         handleOpen({ x, y });
                     } else {
@@ -147,10 +146,38 @@ function Dialog() {
     }, []);
 
     const stopPassTheEvent = e => e.stopPropagation();
+    // return (
+    //     <div id="jyutpingpopupdialogid">
+    //         <Box onMouseUp={stopPassTheEvent} sx={modalStyle}>
+    //             <Typography id="modal-modal-title" variant="h6" component="h2" sx={textStyle}>
+    //                 {allText}
+    //             </Typography>
+    //         </Box>
+    //     </div>
+    // );
+
     return (
         <div id="jyutpingpopupdialogid">
-            <Box onMouseUp={stopPassTheEvent} sx={modalStyle}>
-                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ mt: 2, color: 'black', fontSize: '1rem' }}>
+            <Box
+                onMouseUp={stopPassTheEvent}
+                sx={{
+                    ...modalStyle,
+                    // position: 'relative', // Add this to position the close button
+                }}
+            >
+                <IconButton
+                    aria-label="close"
+                    onClick={handleClose} // You need to define this function
+                    sx={{
+                        position: 'absolute',
+                        right: 8,
+                        top: 8,
+                        color: theme => theme.palette.grey[800],
+                    }}
+                >
+                    <CloseIcon />
+                </IconButton>
+                <Typography id="modal-modal-title" variant="h6" component="h2" sx={textStyle}>
                     {allText}
                 </Typography>
             </Box>
