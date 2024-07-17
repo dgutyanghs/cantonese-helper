@@ -3,7 +3,6 @@ import * as React from 'react';
 import '../css/contentScript.css';
 import { hasHanChar, convertText } from '../utils.js';
 import { nanoid } from 'nanoid';
-import TTSpeech from '../tts.js';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { IconButton } from '@mui/material';
@@ -12,6 +11,8 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import { Opacity } from '@mui/icons-material';
 import { lightBlue } from '@mui/material/colors';
+import { alpha } from '@mui/material/styles';
+
 import {
     DICT_KEY,
     DICT_ITEM_KEY,
@@ -57,7 +58,29 @@ function Dialog() {
             left: `${pos.x}px`,
             display: 'block',
         };
-        setModalStyle(newStyle);
+        const newStyle2 = {
+            ...oriStyle,
+            // position: 'absolute',
+            // top: '50%',
+            // left: '50%',
+            // transform: 'translate(-50%, -50%)',
+            // width: 400,
+            bgcolor: theme => alpha(theme.palette.background.paper, 0.5), // This creates a half-transparent background
+            border: '2px solid #000',
+            boxShadow: 24,
+            p: 4,
+            backdropFilter: 'blur(5px)', // This adds a blur effect to the background
+            top: `${pos.y}px`,
+            left: `${pos.x}px`,
+            display: 'block',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: '75%', // Set width to 75%
+            maxWidth: '1200px', // Keep the previous max width
+        };
+        setModalStyle(newStyle2);
     };
 
     React.useEffect(() => {
@@ -102,23 +125,13 @@ function Dialog() {
                     }
 
                     if (hasHanChar(text)) {
-                        // console.log('has Han character, call convertText', text);
+                        console.log('has Han character, call convertText', text);
 
-                        let result = await convertText(text);
-                        console.log(result);
-                        let allText = result.map(e => (
-                            <ruby className="textforjyut" key={nanoid()}>
-                                {e[0]}
-                                <rp>(</rp>
-                                <rt className="jyut">{e[1]}</rt>
-                                <rp>)</rp>
-                            </ruby>
-                        ));
-                        setAllText(allText);
-                        setSoundText(text); //reserve Text for play again.
-                        TTSpeech.getInstance().speak(text);
+                        // let result = await convertText(text);
+                        // console.log(result);
+                        chrome.runtime.sendMessage({ action: 'fetchTranslation', text: text });
+                        setAllText(text);
                         handleOpen({ x, y });
-                        setCovertResult(result);
                     } else {
                         console.log('Not Han character', text);
                     }
@@ -131,77 +144,14 @@ function Dialog() {
                     break;
             }
         });
-
-        chrome.storage.sync.get(DICT_KEY, result => {
-            console.log('storage get result=', result);
-            const wordArray = result[DICT_KEY];
-            console.log('storage wordArray', wordArray);
-            if (wordArray === null || wordArray === undefined) {
-                console.log('Dialog wordArray is undefined or null');
-            } else {
-                console.log('Dialog wordArray is not empty', wordArray);
-                setWordArray(wordArray);
-            }
-        });
-
     }, []);
-
-    const playSound = () => TTSpeech.getInstance().speak(soundText);
-    const addToList = () => {
-        console.log(covertResult);
-        const result = covertResult.reduce(
-            (acc, [key, value]) => {
-                acc.keys.push(key);
-                acc.values.push(value);
-                return acc;
-            },
-            { keys: [], values: [] }
-        );
-
-        const textArray = result.keys;
-        const jyutArray = result.values;
-
-        /**
-         * Don't add the same word in wordArray
-         */
-        const arr = wordArray.filter(item => item[DICT_ITEM_KEY].join('') === textArray.join(''));
-        if (arr.length > 0) {
-            console.log('arr is already exist', arr, textArray);
-            return;
-        }
-        console.log(textArray, jyutArray, 'wordArray=', wordArray);
-        const newArray = [{ [DICT_ITEM_KEY]: textArray, [DICT_ITEM_VAL]: jyutArray }, ...wordArray];
-        setWordArray(newArray);
-        // console.log('Dialog wordArray:', wordArray);
-        // console.log('Dialog newArray:', newArray);
-        const newDict = { [DICT_KEY]: newArray };
-        chrome.storage.sync.set(newDict, () => {
-            console.log('switch data is saved', newDict);
-        });
-    };
 
     const stopPassTheEvent = e => e.stopPropagation();
     return (
         <div id="jyutpingpopupdialogid">
             <Box onMouseUp={stopPassTheEvent} sx={modalStyle}>
-                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ mt: 2, color: 'black',fontSize: '1rem' }}>
+                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ mt: 2, color: 'black', fontSize: '1rem' }}>
                     {allText}
-                </Typography>
-                <hr />
-                <Typography sx={{ fontSize: '0.7rem' }}>
-                    <BingDictScrape text={soundText} />
-                </Typography>
-                <div id="buttons-container">
-                    <IconButton onClick={playSound} color="primary" aria-label="play sound">
-                        <VolumeUpIcon />
-                    </IconButton>
-                    <IconButton onClick={addToList} color="primary" data-aug="hello" aria-label="add word to list">
-                        <AddIcon />
-                    </IconButton>
-                </div>
-                <hr />
-                <Typography sx={{ fontSize: '0.7rem' }}>
-                    <TranslateLink soundText={soundText} />
                 </Typography>
             </Box>
         </div>

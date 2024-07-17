@@ -9,7 +9,7 @@ import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DICT_ITEM_KEY, DICT_ITEM_VAL, DICT_KEY } from '../constant';
 import { Box, Divider } from '@mui/material';
-import TTSpeech from '../tts';
+import TTSpeech, { speakChineseMale, speakLongText} from '../tts';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import MessageBox from './MessageBox';
@@ -47,7 +47,8 @@ export default function CheckboxList() {
     const handlePlaySound = text => e => {
         console.log('handlePlaySound e=', e);
         e.stopPropagation();
-        TTSpeech.getInstance().speak(text);
+        // TTSpeech.getInstance().speak(text);
+        speakLongText(text);
     };
 
     const handleDeleteItem = text => e => {
@@ -94,7 +95,8 @@ export default function CheckboxList() {
                         <ListItem
                             onClick={e => {
                                 // console.log('onClick e.target value', e.target.innerHTML);
-                                TTSpeech.getInstance().speak(text);
+                                // TTSpeech.getInstance().speak(text);
+                                speakLongText(text);
                             }}
                             sx={{ maxHeight: 56, bgcolor: `${i % 2 == 0 ? '#D0D0D0' : '#DCDCDC'}`,'&:hover': {
                                 backgroundColor: 'lightblue',
