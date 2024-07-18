@@ -1,6 +1,6 @@
 import Trie from './Trie.js';
 import MessageManager from './MessageManager.js';
-import { speakLongText, stopSpeaking } from './ttsbg.js';
+import { speakLongText, speakLongTextWithResponse, stopSpeaking } from './ttsbg.js';
 
 /**
  * 轉換一個字串，取得字串中每個字及其讀音。
@@ -26,20 +26,50 @@ function convert(t, s) {
     return res;
 }
 
+// chrome.runtime.onConnect.addListener(function(port) {
+//     console.assert(port.name === "tts-channel");
+//     port.onMessage.addListener(function(msg) {
+//         if (msg.action === 'TTSStartSpeaking') {
+//             // Start TTS process
+//             startTTS(msg.text, port);
+//         }
+//     });
+// });
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "TTSStartSpeaking") {
-        let text = request.text;
-        console.log("bg speak text:", text)
-        let ret = speakLongText(text)
-        if (ret === true) {
-            sendResponse({ result: true });
+function startTTS(text, port) {
+    // Example TTS process
+    let words = text.split(',');
+    let i = 0;
+    
+    function speakWord() {
+        if (i < words.length) {
+            // Simulate speaking a word
+            console.log('Speaking:', words[i]);
+            port.postMessage({status: 'speaking', word: words[i]});
+            i++;
+            setTimeout(speakWord, 500); // Adjust timing as needed
+        } else {
+            port.postMessage({status: 'finished'});
         }
-    } else if (request.action === "TTSStop") {
-        stopSpeaking()
-    } 
-    return true; // Keep the message channel open for asynchronous sendResponse
-});
+    }
+    
+    speakWord();
+}
+
+// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+//     if (request.action === "TTSStartSpeaking") {
+//         let text = request.text;
+//         console.log("bg speak text:", text)
+//         // let ret = speakLongText(text)
+//         speakLongTextWithResponse(text, sendResponse);
+//         // if (ret === true) {
+//         //     sendResponse({ result: true });
+//         // }
+//     } else if (request.action === "TTSStop") {
+//         stopSpeaking()
+//     } 
+//     return true; // Keep the message channel open for asynchronous sendResponse
+// });
 
 async function fetchTranslation(text) {
     // https://cn.bing.com/dict/search?mkt=zh-cn&q=
@@ -67,6 +97,7 @@ async function fetchTranslation(text) {
         const mm = new MessageManager(port);
         mm.registerHandler('convert', s => convert(t, s));
         // console.log('service Worker, onConnect ready, mm=', mm);
+        mm.registerHandlerSubtitle('subtitle', (s)=> speakLongTextWithResponse(s,port))
         const pingTimer = mm.startPingTimer(10);
 
         port.onDisconnect.addListener(p => {

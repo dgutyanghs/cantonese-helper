@@ -37,7 +37,7 @@ class MessageManager {
         return new Promise(resolve => {
             port.onMessage.addListener(function f(response) {
                 if (response.id === id) {
-                    port.onMessage.removeListener(f);
+                    // port.onMessage.removeListener(f);
                     resolve(response.msg);
                 }
             });
@@ -62,6 +62,43 @@ class MessageManager {
         });
     }
 
+    registerHandlerSubtitle(command, f) {
+        const { port } = this;
+        port.onMessage.addListener(receiveMsg => {
+            // console.log('bg service receive msg:', receiveMsg);
+            if (receiveMsg.name === command) {
+                f(receiveMsg.str, port);
+                // port.postMessage({ msg: res, id: receiveMsg.id });
+                // console.log('bg service dict result:', res);
+            }
+        });
+    }
+
+    sendMessageSubtitle(command, str) {
+        const { port } = this;
+
+
+        port.postMessage({ str, name: command });
+        // const id = nanoid();
+        // return new Promise(resolve => {
+        //     port.onMessage.addListener(function f(response) {
+        //             resolve(response);
+        //     });
+        //     port.postMessage({ str, name: command });
+        // });
+    }
+
+    receiveMessageSubtitleEvent(command, f) {
+        const { port } = this;
+        port.onMessage.addListener(response => {
+            if (command === response.name) {
+                console.log("command match,response", response)
+                f(response.text, response.isFinished);
+            }else {
+                // console.log("command not match", response)
+            }
+        });
+    }
     //code in contentScript.js
     keepAliveHandler = () => {
         const { port } = this;
@@ -84,9 +121,14 @@ class MessageManager {
                 msg: 'keep-alive',
                 id: 'ping+' + id,
             });
+            // for subtitle
+            // port.postMessage({
+            //     msg: 'keep-alive',
+            //     id: 'ping+' + id,
+            // });
         }, 1000 * seconds); 
         return pingInterval;
-    }
+    };
 }
 
 export default MessageManager;

@@ -13,6 +13,7 @@ import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import { Opacity } from '@mui/icons-material';
 import { lightBlue } from '@mui/material/colors';
 import { alpha } from '@mui/material/styles';
+import { mm } from '../contentScript.js'
 
 import {
     DICT_KEY,
@@ -45,14 +46,23 @@ function Dialog() {
     const [covertResult, setCovertResult] = React.useState([]);
     const [wordArray, setWordArray] = React.useState([]);
 
+    const handleCloseAutoAfterFinishedSubtitleReading = () => {
+        const newStyle = {
+            ...oriStyle,
+            display: 'none',
+        };
+
+        setModalStyle(newStyle);
+        window.getSelection().empty(); //deSelect the text previous selected by mouse .
+    };
     const handleClose = () => {
         const newStyle = {
             ...oriStyle,
             display: 'none',
         };
 
-        chrome.runtime.sendMessage({ action: 'TTSStop', text: "" }, response => {
-            console.log('TTS stop speaking');
+        chrome.runtime.sendMessage({ action: 'TTSStop', text: '' }, response => {
+            console.log('TTS stop speaking', response);
         });
         setModalStyle(newStyle);
     };
@@ -74,8 +84,8 @@ function Dialog() {
             top: '80%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
-            width: '85%', // Set width to 75%
-            maxWidth: '1200px', // Keep the previous max width
+            width: '90%', // Set width to 75%
+            maxWidth: '1600px', // Keep the previous max width
             display: 'flex', // Add this
             justifyContent: 'center', // Add this
             alignItems: 'center', // Add this
@@ -85,7 +95,7 @@ function Dialog() {
 
     const textStyle = {
         color: 'orange',
-        fontSize: '2rem',
+        fontSize: '3rem',
         textAlign: 'center',
         width: '100%',
         fontWeight: 'bold',
@@ -109,27 +119,37 @@ function Dialog() {
                 console.log('get message, wordArray updated:', wordArrayOption);
             }
         });
+        /**
+         * for subtitle reading
+         */
+        mm.receiveMessageSubtitleEvent("subtitle", (text, isFinished) => {
+            // console.log("receive text=",text)
+            setAllText(text);
+
+            if(isFinished) {
+                handleCloseAutoAfterFinishedSubtitleReading();
+            }
+        })
+
         window.addEventListener('message', async event => {
             const { origin, data } = event;
             const { key, val } = data;
-            let keyForMousePressed = USER_SELECT_OPTION_KEY_NONE;
+
             if (key !== 'selection' && key !== 'empty') return;
 
             // console.log('!!!@@@', key, val);
             switch (key) {
                 case 'selection':
                     let { x, y, text } = val;
-                    console.log('selection, x,y', x, y);
+                    // console.log('selection, x,y', x, y);
 
                     if (hasHanChar(text)) {
-                        console.log('has Han character, call convertText', text);
+                        // console.log('has Han character, call convertText', text);
 
                         // let result = await convertText(text);
                         // console.log(result);
-                        chrome.runtime.sendMessage({ action: 'TTSStartSpeaking', text: text }, response => {
-                            console.log('in Dialog.jsx speak finished,response=', response);
-                        });
-                        setAllText(text);
+                        mm.sendMessageSubtitle("subtitle", text);
+                        // setAllText(text);
                         handleOpen({ x, y });
                     } else {
                         console.log('Not Han character', text);
@@ -137,8 +157,11 @@ function Dialog() {
                     break;
                 case 'empty':
                     console.log('receive mssage,select empty');
+                    setAllText('');
                     handleClose();
+
                     break;
+
                 default:
                     break;
             }
