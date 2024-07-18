@@ -79,13 +79,6 @@ class MessageManager {
 
 
         port.postMessage({ str, name: command });
-        // const id = nanoid();
-        // return new Promise(resolve => {
-        //     port.onMessage.addListener(function f(response) {
-        //             resolve(response);
-        //     });
-        //     port.postMessage({ str, name: command });
-        // });
     }
 
     receiveMessageSubtitleEvent(command, f) {

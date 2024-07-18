@@ -13,7 +13,7 @@ import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import { Opacity } from '@mui/icons-material';
 import { lightBlue } from '@mui/material/colors';
 import { alpha } from '@mui/material/styles';
-import { mm } from '../contentScript.js'
+import { mm } from '../contentScript.js';
 
 import {
     DICT_KEY,
@@ -122,14 +122,14 @@ function Dialog() {
         /**
          * for subtitle reading
          */
-        mm.receiveMessageSubtitleEvent("subtitle", (text, isFinished) => {
+        mm.receiveMessageSubtitleEvent('subtitle', (text, isFinished) => {
             // console.log("receive text=",text)
             setAllText(text);
 
-            if(isFinished) {
+            if (isFinished) {
                 handleCloseAutoAfterFinishedSubtitleReading();
             }
-        })
+        });
 
         window.addEventListener('message', async event => {
             const { origin, data } = event;
@@ -148,7 +148,8 @@ function Dialog() {
 
                         // let result = await convertText(text);
                         // console.log(result);
-                        mm.sendMessageSubtitle("subtitle", text);
+                        let newText = text.replaceAll('#', ''); // ignore # in twitter post
+                        mm.sendMessageSubtitle('subtitle', newText);
                         // setAllText(text);
                         handleOpen({ x, y });
                     } else {
