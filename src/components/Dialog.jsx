@@ -65,6 +65,7 @@ function Dialog() {
             console.log('TTS stop speaking', response);
         });
         setModalStyle(newStyle);
+        window.getSelection().empty(); //deSelect the text previous selected by mouse .
     };
     const handleOpen = pos => {
         // const newStyle = {
@@ -75,13 +76,13 @@ function Dialog() {
         // };
         const newStyle2 = {
             ...oriStyle,
-            bgcolor: theme => alpha(theme.palette.background.paper, 0.7), // This creates a half-transparent background
-            border: '2px solid #000',
-            boxShadow: 24,
-            p: 4,
-            backdropFilter: 'blur(5px)', // This adds a blur effect to the background
+            bgcolor: theme => alpha(theme.palette.background.paper, 0.1), // This creates a half-transparent background
+            // border: '2px solid #000',
+            // boxShadow: 24,
+            // p: 4,
+            backdropFilter: 'blur(3px)', // This adds a blur effect to the background
             position: 'fixed',
-            top: '80%',
+            top: '90%',
             left: '50%',
             transform: 'translate(-50%, -50%)',
             width: '90%', // Set width to 75%
@@ -95,7 +96,7 @@ function Dialog() {
 
     const textStyle = {
         color: 'orange',
-        fontSize: '3rem',
+        fontSize: '2rem',
         textAlign: 'center',
         width: '100%',
         fontWeight: 'bold',
@@ -170,18 +171,9 @@ function Dialog() {
     }, []);
 
     const stopPassTheEvent = e => e.stopPropagation();
-    // return (
-    //     <div id="jyutpingpopupdialogid">
-    //         <Box onMouseUp={stopPassTheEvent} sx={modalStyle}>
-    //             <Typography id="modal-modal-title" variant="h6" component="h2" sx={textStyle}>
-    //                 {allText}
-    //             </Typography>
-    //         </Box>
-    //     </div>
-    // );
 
     return (
-        <div id="jyutpingpopupdialogid">
+        <div id="twittersmile">
             <Box
                 onMouseUp={stopPassTheEvent}
                 sx={{
