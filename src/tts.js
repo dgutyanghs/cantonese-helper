@@ -1,13 +1,13 @@
 let timeoutResumeInfinity = null;
-const SpeechLang = "zh-HK";
+const SpeechLang = 'zh-HK';
 // const SpeechLang = 'zh-CN';
 
 class TTSpeech {
     constructor(text = '') {
         if (!TTSpeech.instance) {
             let utterance = new SpeechSynthesisUtterance(text);
-            utterance.pitch = 1.6;
-            utterance.rate = 1.2;
+            utterance.pitch = 1.0;
+            utterance.rate = 1.0;
             utterance.volume = 1;
             utterance.voiceURI = 'native';
 
@@ -82,20 +82,20 @@ class TTSpeech {
             if (index < chunks.length) {
                 utterance.text = chunks[index].trim();
                 window.speechSynthesis.speak(utterance);
-            }else {
-                console.log("all chunks had been speak")
-            }            
+            } else {
+                console.log('all chunks had been speak');
+            }
+
+            utterance.onend = function (e) {
+                // console.log('@@@Finished in ' + e.elapsedTime + ' seconds.');
+                speakNextChunk(index + 1);
+            };
+            utterance.onstart = e => {
+                console.log('tts start,', e.utterance.text);
+            };
         }
-        utterance.onend = function (e) {
-            // console.log('@@@Finished in ' + e.elapsedTime + ' seconds.');
-            speakNextChunk(index + 1)
-        };
-        utterance.onstart = e => {
-            console.log('tts start,', e.utterance.text);
-        };
 
-
-        speakNextChunk(0) 
+        speakNextChunk(0);
         // window.speechSynthesis.speak(utterance);
     };
     speak = text => {
