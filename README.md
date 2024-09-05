@@ -10,8 +10,9 @@ A handy tool to assist with learning and translating Cantonese by using Jyutping
 
 
 ![Logo](./chrome%20web%20store.png)
-[Cantonese Helper](https://chromewebstore.google.com/detail/cantonese-helper/jfincemdopkabfjdjbhekkblihbbpdpn)
+install for Chrome [Cantonese Helper](https://chromewebstore.google.com/detail/cantonese-helper/jfincemdopkabfjdjbhekkblihbbpdpn)
 
+**This extension also work in Edge browser , you can download it in Releases section and load it manually.**
 ### introduce
    * Cantonese Helper is a Chrome extension to help people learn Cantonese. it uses jyutping which is an easy way for new beginners.
 
