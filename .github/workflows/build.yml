@@ -10,26 +10,22 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [20.x]
-
     steps:
     - uses: actions/checkout@v4
 
-    - name: Use Node.js ${{ matrix.node-version }}
+    - name: Use Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: '20.x'
 
     - name: Install Yarn
       run: npm install -g yarn
 
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn cache dir)"
+      run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
-    - uses: actions/cache@v4
+    - uses: actions/cache@v3
       id: yarn-cache
       with:
         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -44,25 +40,13 @@ jobs:
       run: yarn build
 
     - name: Zip the build
-      run: zip -r cantonese-helper.zip dist
+      run: zip -r cantonese-helper-chrome-extension.zip dist
 
     - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: v${{ github.run_number }}
-        release_name: Release ${{ github.run_number }}
-        draft: false
-        prerelease: false
-
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./cantonese-helper.zip
-        asset_name: cantonese-helper.zip
-        asset_content_type: application/zip
+      run: |
+        gh release create v${{ github.run_number }} \
+          --title "Release ${{ github.run_number }}" \
+          --notes "Automated release for build ${{ github.run_number }}" \
+          cantonese-helper-chrome-extension.zip
