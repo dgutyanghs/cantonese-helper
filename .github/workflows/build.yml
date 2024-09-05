@@ -1,4 +1,4 @@
-name: Build Chrome Extension
+name: Build and Release Chrome Extension
 
 on:
   push:
@@ -12,13 +12,13 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.x, 18.x]
+        node-version: [20.x]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
 
@@ -29,7 +29,7 @@ jobs:
       id: yarn-cache-dir-path
       run: echo "::set-output name=dir::$(yarn cache dir)"
 
-    - uses: actions/cache@v3
+    - uses: actions/cache@v4
       id: yarn-cache
       with:
         path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -43,8 +43,26 @@ jobs:
     - name: Build the extension
       run: yarn build
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
+    - name: Zip the build
+      run: zip -r cantonese-helper.zip dist
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        name: cantonese-helper
-        path: dist/
+        tag_name: v${{ github.run_number }}
+        release_name: Release ${{ github.run_number }}
+        draft: false
+        prerelease: false
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./cantonese-helper.zip
+        asset_name: cantonese-helper.zip
+        asset_content_type: application/zip
