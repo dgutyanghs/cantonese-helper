@@ -26,6 +26,17 @@ function convert(t, s) {
     return res;
 }
 
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "fetchTranslation") {
+        fetchTranslation(request.text).then(response => {
+            sendResponse({ result: response });
+        }).catch(error => {
+            sendResponse({ error: error.message });
+        });
+    }
+    return true; // Keep the message channel open for asynchronous sendResponse
+});
+
 // chrome.runtime.onConnect.addListener(function(port) {
 //     console.assert(port.name === "tts-channel");
 //     port.onMessage.addListener(function(msg) {

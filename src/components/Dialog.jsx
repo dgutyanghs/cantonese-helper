@@ -6,7 +6,8 @@ import { nanoid } from 'nanoid';
 import TTSpeech from '../tts.js';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { IconButton } from '@mui/material';
+import { IconButton, Stack } from '@mui/material';
+import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
@@ -42,6 +43,7 @@ function Dialog() {
     const [modalStyle, setModalStyle] = React.useState(oriStyle);
     const [covertResult, setCovertResult] = React.useState([]);
     const [wordArray, setWordArray] = React.useState([]);
+    const [textInWords, setTextInWords] = React.useState(false)
 
     const handleClose = () => {
         const newStyle = {
@@ -49,6 +51,7 @@ function Dialog() {
             display: 'none',
         };
         setModalStyle(newStyle);
+        setTextInWords(false);
     };
     const handleOpen = pos => {
         const newStyle = {
@@ -107,12 +110,12 @@ function Dialog() {
                         let result = await convertText(text);
                         console.log(result);
                         let allText = result.map(e => (
-                                <ruby className="textforjyut" key={nanoid()}>
-                                    {e[0]}
-                                    <rp>(</rp>
-                                    <rt className="jyut">{e[1]}</rt>
-                                    <rp>)</rp>
-                                </ruby>
+                            <ruby className="textforjyut" key={nanoid()}>
+                                {e[0]}
+                                <rp>(</rp>
+                                <rt className="jyut">{e[1]}</rt>
+                                <rp>)</rp>
+                            </ruby>
                         ));
                         setAllText(allText);
                         setSoundText(text); //reserve Text for play again.
@@ -147,6 +150,10 @@ function Dialog() {
 
     const playSound = () => TTSpeech.getInstance().speakLong(soundText);
     const addToList = () => {
+        /**
+         * no matter this text already in the words or not, set state to true for UI
+         */
+        setTextInWords(true)
         console.log(covertResult);
         const result = covertResult.reduce(
             (acc, [key, value]) => {
@@ -190,14 +197,18 @@ function Dialog() {
                 <Typography sx={{ fontSize: '0.7rem' }}>
                     <BingDictScrape text={soundText} />
                 </Typography>
-                <div id="buttons-container">
-                    <IconButton onClick={playSound} color="primary" aria-label="play sound">
-                        <VolumeUpIcon />
-                    </IconButton>
-                    <IconButton onClick={addToList} color="primary" data-aug="hello" aria-label="add word to list">
-                        <AddIcon />
-                    </IconButton>
-                </div>
+                <Stack direction={'row'} bgcolor={'darkgray'} spacing={4} justifyContent={'center'}>
+                    <Tooltip title="speak" >
+                        <IconButton onClick={playSound} color="primary" aria-label="play sound">
+                            <VolumeUpIcon />
+                        </IconButton>
+                    </Tooltip>
+                    <Tooltip title="save">
+                        <IconButton onClick={addToList} color={textInWords ? "secondary":"primary" } data-aug="hello" aria-label="add word to list">
+                            <AddIcon />
+                        </IconButton>
+                    </Tooltip>
+                </Stack>
                 <hr />
                 <Typography sx={{ fontSize: '0.7rem' }}>
                     <TranslateLink soundText={soundText} />
