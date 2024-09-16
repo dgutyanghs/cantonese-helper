@@ -11,7 +11,7 @@ import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
-import { Opacity } from '@mui/icons-material';
+import { ClassSharp, Opacity } from '@mui/icons-material';
 import { lightBlue } from '@mui/material/colors';
 import {
     DICT_KEY,
@@ -25,6 +25,7 @@ import {
 import TranslateLink from './TranslateLink';
 import BingDictScrape from './BingDictScrape';
 import { keyForMouseSelected } from '../contentScript.js';
+import { myDatabase } from '../database.js';
 
 const oriStyle = {
     position: 'absolute',
@@ -43,7 +44,7 @@ function Dialog() {
     const [modalStyle, setModalStyle] = React.useState(oriStyle);
     const [covertResult, setCovertResult] = React.useState([]);
     const [wordArray, setWordArray] = React.useState([]);
-    const [textInWords, setTextInWords] = React.useState(false)
+    const [textInWords, setTextInWords] = React.useState(false);
 
     const handleClose = () => {
         const newStyle = {
@@ -134,18 +135,18 @@ function Dialog() {
                     break;
             }
         });
-
-        chrome.storage.sync.get(DICT_KEY, result => {
-            console.log('storage get result=', result);
-            const wordArray = result[DICT_KEY];
-            console.log('storage wordArray', wordArray);
-            if (wordArray === null || wordArray === undefined) {
-                console.log('Dialog wordArray is undefined or null');
-            } else {
-                console.log('Dialog wordArray is not empty', wordArray);
-                setWordArray(wordArray);
-            }
-        });
+        // myDatabase.open(); // open database
+        // chrome.storage.sync.get(DICT_KEY, result => {
+        //     console.log('storage get result=', result);
+        //     const wordArray = result[DICT_KEY];
+        //     console.log('storage wordArray', wordArray);
+        //     if (wordArray === null || wordArray === undefined) {
+        //         console.log('Dialog wordArray is undefined or null');
+        //     } else {
+        //         console.log('Dialog wordArray is not empty', wordArray);
+        //         setWordArray(wordArray);
+        //     }
+        // });
     }, []);
 
     const playSound = () => TTSpeech.getInstance().speakLong(soundText);
@@ -153,7 +154,7 @@ function Dialog() {
         /**
          * no matter this text already in the words or not, set state to true for UI
          */
-        setTextInWords(true)
+        setTextInWords(true);
         console.log(covertResult);
         const result = covertResult.reduce(
             (acc, [key, value]) => {
@@ -166,24 +167,37 @@ function Dialog() {
 
         const textArray = result.keys;
         const jyutArray = result.values;
+        const textKey = textArray.join('');
+        const data = [textArray, jyutArray];
+        // console.log("data", data);
 
+        myDatabase.add(textKey, data);
+        myDatabase.getData(textKey, data => {
+            console.log('textKey getData', data);
+        });
+        // myDatabase.getData("23", data => {
+        //         console.log('23getData', data);
+        // });
+        // myDatabase.getAll(data => {
+        //     console.log('getAll', data);
+        // });
         /**
          * Don't add the same word in wordArray
          */
-        const arr = wordArray.filter(item => item[DICT_ITEM_KEY].join('') === textArray.join(''));
-        if (arr.length > 0) {
-            console.log('arr is already exist', arr, textArray);
-            return;
-        }
-        console.log(textArray, jyutArray, 'wordArray=', wordArray);
-        const newArray = [{ [DICT_ITEM_KEY]: textArray, [DICT_ITEM_VAL]: jyutArray }, ...wordArray];
-        setWordArray(newArray);
-        // console.log('Dialog wordArray:', wordArray);
-        // console.log('Dialog newArray:', newArray);
-        const newDict = { [DICT_KEY]: newArray };
-        chrome.storage.sync.set(newDict, () => {
-            console.log('switch data is saved', newDict);
-        });
+        // const arr = wordArray.filter(item => item[DICT_ITEM_KEY].join('') === textArray.join(''));
+        // if (arr.length > 0) {
+        //     console.log('arr is already exist', arr, textArray);
+        //     return;
+        // }
+        // console.log(textArray, jyutArray, 'wordArray=', wordArray);
+        // const newArray = [{ [DICT_ITEM_KEY]: textArray, [DICT_ITEM_VAL]: jyutArray }, ...wordArray];
+        // setWordArray(newArray);
+        // // console.log('Dialog wordArray:', wordArray);
+        // // console.log('Dialog newArray:', newArray);
+        // const newDict = { [DICT_KEY]: newArray };
+        // chrome.storage.sync.set(newDict, () => {
+        //     console.log('switch data is saved', newDict);
+        // });
     };
 
     const stopPassTheEvent = e => e.stopPropagation();
@@ -198,13 +212,18 @@ function Dialog() {
                     <BingDictScrape text={soundText} />
                 </Typography>
                 <Stack direction={'row'} bgcolor={'darkgray'} spacing={4} justifyContent={'center'}>
-                    <Tooltip title="speak" >
+                    <Tooltip title="speak">
                         <IconButton onClick={playSound} color="primary" aria-label="play sound">
                             <VolumeUpIcon />
                         </IconButton>
                     </Tooltip>
                     <Tooltip title="save">
-                        <IconButton onClick={addToList} color={textInWords ? "secondary":"primary" } data-aug="hello" aria-label="add word to list">
+                        <IconButton
+                            onClick={addToList}
+                            color={textInWords ? 'secondary' : 'primary'}
+                            data-aug="hello"
+                            aria-label="add word to list"
+                        >
                             <AddIcon />
                         </IconButton>
                     </Tooltip>

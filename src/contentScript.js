@@ -5,6 +5,7 @@ import Dialog from './components/Dialog';
 import MessageManager from './MessageManager.js';
 import { MOUSE_AND_KEY, SWITCH_POPUP, USER_SELECT_OPTION_KEY_NONE, DICT_KEY } from './constant';
 // 注入 web_accessible_resources.js
+import { myDatabase } from './database.js'
 
 const injectScriptToPage = async () => {
     function injectScript(file_path, tag) {
@@ -99,8 +100,24 @@ const init = async () => {
     console.log('contentSrcipts init, keyForMouseSelected =', keyForMouseSelected);
 };
 
+
+async function initializeAndUseDatabase() {
+    await myDatabase.open();
+
+    // Add some data
+    // await myDatabase.add("民国", [["民", "国"], ["man4", "gwok3"]]);
+
+    // Retrieve data
+    // myDatabase.getData("民国", data => {
+    //     console.log('民国getData', data);
+    // });
+}
+
+
 port = chrome.runtime.connect({ name: 'knockknock' });
 msgManager = new MessageManager(port);
 msgManager.keepAliveHandler();
 init();
+
+initializeAndUseDatabase();
 export const mm = msgManager;
