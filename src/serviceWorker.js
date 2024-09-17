@@ -1,6 +1,7 @@
 import Trie from './Trie.js';
 import MessageManager from './MessageManager.js';
 import { speakLongText, speakLongTextWithResponse, stopSpeaking } from './ttsbg.js';
+import { myDatabase } from './database.js';
 
 /**
  * 轉換一個字串，取得字串中每個字及其讀音。
@@ -27,16 +28,59 @@ function convert(t, s) {
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "fetchTranslation") {
-        fetchTranslation(request.text).then(response => {
-            sendResponse({ result: response });
-        }).catch(error => {
-            sendResponse({ error: error.message });
-        });
+    if (request.action === 'fetchTranslation') {
+        fetchTranslation(request.text)
+            .then(response => {
+                sendResponse({ result: response });
+            })
+            .catch(error => {
+                sendResponse({ error: error.message });
+            });
     }
     return true; // Keep the message channel open for asynchronous sendResponse
 });
 
+// Listen for messages from content script or options page
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'add') {
+        try {
+            myDatabase.add(request.text_key, request.data);
+            sendResponse({ success: true });
+        } catch (error) {
+            console.error(error);
+            sendResponse({ success: false, error: error });
+        }
+        return true; // Indicates we wish to send a response asynchronously
+    }
+    //   const transaction = db.transaction(["YourObjectStoreName"], "readwrite");
+    //   const objectStore = transaction.objectStore("YourObjectStoreName");
+    // //   const addRequest = objectStore.add(request.data);
+    // //   addRequest.onsuccess = () => sendResponse({success: true});
+    // //   return true;  // Indicates we wish to send a response asynchronously
+    // }
+
+    if (request.action === 'getAll') {
+        myDatabase.getAll(data => {
+            if (!data) {
+                sendResponse({ data: data });
+            } else {
+                sendResponse({ data: null });
+            }
+        });
+        return true; // Indicates we wish to send a response asynchronously
+    }
+    //   const transaction = db.transaction(["YourObjectStoreName"], "readonly");
+    //   const objectStore = transaction.objectStore("YourObjectStoreName");
+    //   const getAllRequest = objectStore.getAll();
+    //   getAllRequest.onsuccess = () => sendResponse({data: getAllRequest.result});
+    //   return true;  // Indicates we wish to send a response asynchronously
+    // }
+    if (request.action === 'delete') {
+        myDatabase.delete(request.data);
+        sendResponse({ success: true });
+        return true; // Indicates we wish to send a response asynchronously
+    }
+});
 // chrome.runtime.onConnect.addListener(function(port) {
 //     console.assert(port.name === "tts-channel");
 //     port.onMessage.addListener(function(msg) {
@@ -51,19 +95,19 @@ function startTTS(text, port) {
     // Example TTS process
     let words = text.split(',');
     let i = 0;
-    
+
     function speakWord() {
         if (i < words.length) {
             // Simulate speaking a word
             console.log('Speaking:', words[i]);
-            port.postMessage({status: 'speaking', word: words[i]});
+            port.postMessage({ status: 'speaking', word: words[i] });
             i++;
             setTimeout(speakWord, 500); // Adjust timing as needed
         } else {
-            port.postMessage({status: 'finished'});
+            port.postMessage({ status: 'finished' });
         }
     }
-    
+
     speakWord();
 }
 
@@ -78,14 +122,14 @@ function startTTS(text, port) {
 //         // }
 //     } else if (request.action === "TTSStop") {
 //         stopSpeaking()
-//     } 
+//     }
 //     return true; // Keep the message channel open for asynchronous sendResponse
 // });
 
 async function fetchTranslation(text) {
     // https://cn.bing.com/dict/search?mkt=zh-cn&q=
     const url = `https://cn.bing.com/dict/search?mkt=zh-cn&q=${encodeURIComponent(text)}`;
-    console.log("fetch Translation for ", text)
+    console.log('fetch Translation for ', text);
     const response = await fetch(url);
     if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -94,6 +138,12 @@ async function fetchTranslation(text) {
     return html;
 }
 
+/**
+ * initial database
+ */
+async function initializeAndUseDatabase() {
+    await myDatabase.open();
+}
 
 (async () => {
     const browser = chrome;
@@ -108,7 +158,7 @@ async function fetchTranslation(text) {
         const mm = new MessageManager(port);
         mm.registerHandler('convert', s => convert(t, s));
         // console.log('service Worker, onConnect ready, mm=', mm);
-        mm.registerHandlerSubtitle('subtitle', (s)=> speakLongTextWithResponse(s,port))
+        mm.registerHandlerSubtitle('subtitle', s => speakLongTextWithResponse(s, port));
         const pingTimer = mm.startPingTimer(10);
 
         port.onDisconnect.addListener(p => {
@@ -124,4 +174,6 @@ async function fetchTranslation(text) {
         t.addWord(k, v);
     }
     console.log('diction ready!,size:', t.totalSize());
+
+    initializeAndUseDatabase();
 })();

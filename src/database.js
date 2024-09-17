@@ -5,9 +5,9 @@ class MyDatabase {
     static instance;
 
     constructor() {
-        this.dbName = 'myDatabase2';
+        this.dbName = 'cantonese_database';
         this.dbVersion = 1;
-        this.storeName = 'myStore2';
+        this.storeName = 'my_store4';
         this.db = null;
     }
 
@@ -17,24 +17,6 @@ class MyDatabase {
         }
         return MyDatabase.instance;
     }
-
-    // rest of the class remains the same
-    // open() {
-    //     const request = indexedDB.open(this.dbName, this.dbVersion);
-    //     request.onerror = event => {
-    //         console.error('Error opening database:', event.target.error);
-    //     };
-    //     request.onsuccess = event => {
-    //         this.db = event.target.result;
-    //         console.log('Database opened successfully:', this.db);
-    //     };
-    //     request.onupgradeneeded = event => {
-    //         const db = event.target.result;
-    //         const store = db.createObjectStore(this.storeName, { keyPath: 'id', autoIncrement: true });
-    //         store.createIndex('textKey', 'textKey', { unique: true });
-    //         console.log('Database upgraded successfully:', db);
-    //     };
-    // }
 
     open() {
         return new Promise((resolve, reject) => {
@@ -51,33 +33,17 @@ class MyDatabase {
             request.onupgradeneeded = event => {
                 const db = event.target.result;
                 const store = db.createObjectStore(this.storeName, { keyPath: 'id', autoIncrement: true });
-                store.createIndex('textKey', 'textKey', { unique: true });
+                store.createIndex('text_key', 'text_key', { unique: true });
                 console.log('Database upgraded successfully:', db);
             };
         });
     }
 
-    // add2(textKey, data) {
-    //     return new Promise((resolve, reject) => {
-    //         const transaction = this.db.transaction(this.storeName, 'readwrite');
-    //         const store = transaction.objectStore(this.storeName);
-    //         const request = store.add({ textKey, data });
-    //         request.onerror = event => {
-    //             console.error('Error adding data:', event.target.error);
-    //             reject(event.target.error);
-    //         };
-    //         request.onsuccess = event => {
-    //             console.log('Data added successfully:', event.target.result);
-    //             resolve(event.target.result);
-    //         };
-    //     });
-    // }
-
-    add(textKey, data) {
+    add(text_key, data) {
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction(this.storeName, 'readwrite');
             const store = transaction.objectStore(this.storeName);
-            const request = store.add({ textKey, data });
+            const request = store.add({ text_key, data });
             request.onerror = event => {
                 console.error('Error adding data:', event.target.error);
                 reject(event.target.error);
@@ -89,11 +55,11 @@ class MyDatabase {
         });
     }
 
-    getData(textKey, callbackFn) {
+    getData(text_key, callbackFn) {
         const transaction = this.db.transaction(this.storeName, 'readonly');
         const store = transaction.objectStore(this.storeName);
-        const index = store.index('textKey');
-        const request = index.get(textKey);
+        const index = store.index('text_key');
+        const request = index.get(text_key);
         request.onerror = event => {
             console.error('Error getting data:', event.target.error);
             if (callbackFn) {
@@ -120,18 +86,20 @@ class MyDatabase {
             }
         };
         request.onsuccess = event => {
-            console.log('All data retrieved successfully:', event.target.result);
-            // return event.target.result;
+            const result = event.target.result;
+            console.log('All data retrieved successfully:', result);
             if (callbackFn) {
-                callbackFn(event.target.result);
+                callbackFn(result ? result : null);
             }
         };
     }
 
-    update(id, data) {
+    update(text_key, data) {
         const transaction = this.db.transaction(this.storeName, 'readwrite');
         const store = transaction.objectStore(this.storeName);
-        const request = store.put(data, id);
+        const index = store.index('text_key');
+        // const request = index.delete(text_key);
+        const request = index.put(data, text_key);
         request.onerror = event => {
             console.error('Error updating data:', event.target.error);
         };
@@ -140,10 +108,12 @@ class MyDatabase {
         };
     }
 
-    delete(id) {
+    delete(text_key) {
         const transaction = this.db.transaction(this.storeName, 'readwrite');
         const store = transaction.objectStore(this.storeName);
-        const request = store.delete(id);
+        const index = store.index('text_key');
+        const request = index.delete(text_key);
+        // const request = index.get(text_key);
         request.onerror = event => {
             console.error('Error deleting data:', event.target.error);
         };

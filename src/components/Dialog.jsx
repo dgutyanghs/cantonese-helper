@@ -25,7 +25,7 @@ import {
 import TranslateLink from './TranslateLink';
 import BingDictScrape from './BingDictScrape';
 import { keyForMouseSelected } from '../contentScript.js';
-import { myDatabase } from '../database.js';
+// import { myDatabase } from '../database.js';
 
 const oriStyle = {
     position: 'absolute',
@@ -63,6 +63,17 @@ function Dialog() {
         };
         setModalStyle(newStyle);
     };
+
+    function addData(text_key, data) {
+        chrome.runtime.sendMessage({action: "add", text_key: text_key, data: data}, (response) => {
+          if (response.success) {
+            console.log("Data added successfully");
+          }
+        });
+      }
+      
+      // Use this function to add data
+    //   addData({id: 1, name: "Test"});
 
     React.useEffect(() => {
         /**
@@ -135,18 +146,6 @@ function Dialog() {
                     break;
             }
         });
-        // myDatabase.open(); // open database
-        // chrome.storage.sync.get(DICT_KEY, result => {
-        //     console.log('storage get result=', result);
-        //     const wordArray = result[DICT_KEY];
-        //     console.log('storage wordArray', wordArray);
-        //     if (wordArray === null || wordArray === undefined) {
-        //         console.log('Dialog wordArray is undefined or null');
-        //     } else {
-        //         console.log('Dialog wordArray is not empty', wordArray);
-        //         setWordArray(wordArray);
-        //     }
-        // });
     }, []);
 
     const playSound = () => TTSpeech.getInstance().speakLong(soundText);
@@ -167,14 +166,15 @@ function Dialog() {
 
         const textArray = result.keys;
         const jyutArray = result.values;
-        const textKey = textArray.join('');
+        const text_key = textArray.join('');
         const data = [textArray, jyutArray];
         // console.log("data", data);
 
-        myDatabase.add(textKey, data);
-        myDatabase.getData(textKey, data => {
-            console.log('textKey getData', data);
-        });
+        addData(text_key, data);
+        // myDatabase.add(text_key, data);
+        // myDatabase.getData(text_key, data => {
+        //     console.log('text_key getData', data);
+        // });
         // myDatabase.getData("23", data => {
         //         console.log('23getData', data);
         // });

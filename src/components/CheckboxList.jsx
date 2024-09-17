@@ -16,32 +16,30 @@ import MessageBox from './MessageBox';
 import Tooltip from '@mui/material/Tooltip';
 import DownloadIcon from '@mui/icons-material/Download';
 import CSvExport from './CsvExport';
+// import { myDatabase } from '../database';
+
 
 export default function CheckboxList() {
-    // const [checked, setChecked] = React.useState([0]);
     const [wordArray, setWordArray] = React.useState([]);
 
-    React.useEffect(() => {
-        chrome.storage.sync.get(DICT_KEY, result => {
-            console.log('storage get result=', result);
-            const wordArray = result[DICT_KEY];
-            console.log('storage wordArray', wordArray);
-            if (wordArray === null || wordArray === undefined) {
-                console.log('wordArray is undefined or null');
-            } else {
-                console.log('wordArray is not empty', wordArray);
-                setWordArray(wordArray);
-            }
+    function getAllData() {
+        chrome.runtime.sendMessage({ action: 'getAll' }, response => {
+            console.log(response);
         });
-
-        // save the wordArray when unmounted component, but didn't work, reason unknown
-        // return () => {
-        //     console.log('wordArray', wordArray);
-        //     const newDict = { [DICT_KEY]: wordArray };
-        //     chrome.storage.sync.set(newDict, () => {
-        //         console.log('save wordArray before unmounted CheckboxList', newDict);
-        //     });
-        // };
+    }
+    React.useEffect(() => {
+        // chrome.storage.sync.get(DICT_KEY, result => {
+        //     console.log('storage get result=', result);
+        //     const wordArray = result[DICT_KEY];
+        //     console.log('storage wordArray', wordArray);
+        //     if (wordArray === null || wordArray === undefined) {
+        //         console.log('wordArray is undefined or null');
+        //     } else {
+        //         console.log('wordArray is not empty', wordArray);
+        //         setWordArray(wordArray);
+        //     }
+        // });
+        getAllData();
     }, []);
 
     const handlePlaySound = text => e => {
@@ -53,12 +51,12 @@ export default function CheckboxList() {
     const handleDeleteItem = text => e => {
         e.stopPropagation();
         console.log('handleDeleteItem text=', text);
-        const newArray = wordArray.filter(item => item[DICT_ITEM_KEY].join('') !== text);
-        setWordArray(newArray);
-        const newDict = { [DICT_KEY]: newArray };
-        chrome.storage.sync.set(newDict, () => {
-            console.log('save wordArray handleDeleteItem', newDict);
-        });
+        // const newArray = wordArray.filter(item => item[DICT_ITEM_KEY].join('') !== text);
+        // setWordArray(newArray);
+        // const newDict = { [DICT_KEY]: newArray };
+        // chrome.storage.sync.set(newDict, () => {
+        //     console.log('save wordArray handleDeleteItem', newDict);
+        // });
     };
 
     const handleMessageBoxCallback = (data = []) => {
@@ -87,28 +85,37 @@ export default function CheckboxList() {
             <Divider></Divider>
             <List sx={{ width: '100%', minWidth: 400, bgcolor: 'background.paper', overflow: 'auto', height: '450px' }}>
                 {wordArray.map((item, i) => {
-                    const labelId = `words-list-label-${item[DICT_ITEM_VAL].join('')}`;
-                    const key = item[DICT_ITEM_VAL].join(' ');
-                    const text = item[DICT_ITEM_KEY].join('');
+                    const labelId = `words-list-label-${item['text_key'].join('')}-${i}`;
+                    const jyutping = item['data'][1].join(' ');
+                    const textCharacters = item['data'][0].join('');
                     return (
                         <ListItem
                             onClick={e => {
                                 // console.log('onClick e.target value', e.target.innerHTML);
-                                TTSpeech.getInstance().speakLong(text);
+                                TTSpeech.getInstance().speakLong(textCharacters);
                             }}
-                            sx={{ maxHeight: 56, bgcolor: `${i % 2 == 0 ? '#D0D0D0' : '#DCDCDC'}`,'&:hover': {
-                                backgroundColor: 'lightblue',
-                              }, }}
-                            key={key}
+                            sx={{
+                                'maxHeight': 56,
+                                'bgcolor': `${i % 2 == 0 ? '#D0D0D0' : '#DCDCDC'}`,
+                                '&:hover': {
+                                    backgroundColor: 'lightblue',
+                                },
+                            }}
+                            key={labelId}
                             secondaryAction={
                                 <Box>
                                     <Tooltip title="speak">
-                                        <IconButton onClick={handlePlaySound(text)} edge="end" aria-label="speak">
+                                        <IconButton onClick={handlePlaySound(textCharacters)} edge="end" aria-label="speak">
                                             <VolumeUpIcon color="primary" />
                                         </IconButton>
                                     </Tooltip>
                                     <Tooltip title="delete">
-                                        <IconButton onClick={handleDeleteItem(text)} sx={{ ml: 2 }} edge="end" aria-label="delete">
+                                        <IconButton
+                                            onClick={handleDeleteItem(textCharacters)}
+                                            sx={{ ml: 2 }}
+                                            edge="end"
+                                            aria-label="delete"
+                                        >
                                             <DeleteIcon style={{ color: 'red' }} />
                                         </IconButton>
                                     </Tooltip>
@@ -125,7 +132,7 @@ export default function CheckboxList() {
                                             textOverflow: 'ellipsis',
                                         },
                                     }}
-                                    primary={`${item[DICT_ITEM_KEY].join('')}`}
+                                    primary={textCharacters}
                                 />
                                 <ListItemText
                                     primaryTypographyProps={{
@@ -135,9 +142,8 @@ export default function CheckboxList() {
                                             textOverflow: 'ellipsis',
                                         },
                                     }}
-                                    id={key}
-                                    // id={labelId}
-                                    primary={`${item[DICT_ITEM_VAL].join(' ')}`}
+                                    // id={key}
+                                    primary={jyutping}
                                 />
                             </ListItemButton>
                         </ListItem>

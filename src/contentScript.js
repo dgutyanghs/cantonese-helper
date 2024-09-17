@@ -101,23 +101,10 @@ const init = async () => {
 };
 
 
-async function initializeAndUseDatabase() {
-    await myDatabase.open();
-
-    // Add some data
-    // await myDatabase.add("民国", [["民", "国"], ["man4", "gwok3"]]);
-
-    // Retrieve data
-    // myDatabase.getData("民国", data => {
-    //     console.log('民国getData', data);
-    // });
-}
-
 
 port = chrome.runtime.connect({ name: 'knockknock' });
 msgManager = new MessageManager(port);
 msgManager.keepAliveHandler();
 init();
 
-initializeAndUseDatabase();
 export const mm = msgManager;

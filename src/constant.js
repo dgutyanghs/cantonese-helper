@@ -3,6 +3,9 @@ export const DICT_KEY = "jyut_userDictionary";
 export const DICT_ITEM_KEY = "jyut_dict_item_key";
 export const DICT_ITEM_VAL = "jyut_dict_item_value";
 
+// Key for indexedDB
+export const DB_Text_Key = "text_key";
+
 
 // For activate Dialog, Mouse + key to select text;
 export const MOUSE_AND_KEY = "jyut_mouse_and_key";
