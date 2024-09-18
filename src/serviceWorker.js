@@ -52,32 +52,22 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         }
         return true; // Indicates we wish to send a response asynchronously
     }
-    //   const transaction = db.transaction(["YourObjectStoreName"], "readwrite");
-    //   const objectStore = transaction.objectStore("YourObjectStoreName");
-    // //   const addRequest = objectStore.add(request.data);
-    // //   addRequest.onsuccess = () => sendResponse({success: true});
-    // //   return true;  // Indicates we wish to send a response asynchronously
-    // }
 
     if (request.action === 'getAll') {
         myDatabase.getAll(data => {
-            if (!data) {
-                sendResponse({ data: data });
+            if (data.length) {
+                sendResponse({ data: data, success: true });
             } else {
-                sendResponse({ data: null });
+                sendResponse({ data: null, success: false });
             }
         });
         return true; // Indicates we wish to send a response asynchronously
     }
-    //   const transaction = db.transaction(["YourObjectStoreName"], "readonly");
-    //   const objectStore = transaction.objectStore("YourObjectStoreName");
-    //   const getAllRequest = objectStore.getAll();
-    //   getAllRequest.onsuccess = () => sendResponse({data: getAllRequest.result});
-    //   return true;  // Indicates we wish to send a response asynchronously
-    // }
     if (request.action === 'delete') {
-        myDatabase.delete(request.data);
-        sendResponse({ success: true });
+        console.log('delete ', request.data);
+        myDatabase.delete(request.data, (success) => {
+            sendResponse({ success });
+        });
         return true; // Indicates we wish to send a response asynchronously
     }
 });

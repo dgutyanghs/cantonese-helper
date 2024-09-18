@@ -16,8 +16,8 @@ const CsvExport = ({data}) => {
       console.log('data =', data);
       const cvsData = data.map((item, index) => ({
         'id': index + 1,
-        'character': item[DICT_ITEM_KEY].join(''),
-        'jyutping' :item[DICT_ITEM_VAL].join(' ') 
+        'character': item["data"][0].join(''),
+        'jyutping' :item["data"][1].join(' ') 
       }))
       console.log('cvsData =', cvsData);
       setcvsData(cvsData);

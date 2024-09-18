@@ -108,17 +108,66 @@ class MyDatabase {
         };
     }
 
-    delete(text_key) {
+    delete2(text_key, callbackFn) {
+        // Check if text_key is valid
+        if (text_key === undefined || text_key === null) {
+            console.error('Invalid key:', text_key);
+            callbackFn(false);
+            return;
+        }
+
         const transaction = this.db.transaction(this.storeName, 'readwrite');
         const store = transaction.objectStore(this.storeName);
-        const index = store.index('text_key');
-        const request = index.delete(text_key);
-        // const request = index.get(text_key);
+        const request = store.delete(text_key);
         request.onerror = event => {
             console.error('Error deleting data:', event.target.error);
+            callbackFn(false);
         };
         request.onsuccess = event => {
             console.log('Data deleted successfully:', event.target.result);
+            callbackFn(true);
+        };
+    }
+    delete(text_key, callbackFn) {
+        if (!text_key || typeof text_key !== 'string') {
+            console.error('Invalid text_key:', text_key);
+            callbackFn(false);
+            return;
+        }
+
+        const transaction = this.db.transaction(this.storeName, 'readwrite');
+        const store = transaction.objectStore(this.storeName);
+
+        console.log('Attempting to delete row with text_key:', text_key);
+
+        // First, we need to find the row with the matching text_key
+        const getRequest = store.index('text_key').get(text_key);
+
+        getRequest.onerror = event => {
+            console.error('Error finding row:', event.target.error);
+            callbackFn(false);
+        };
+
+        getRequest.onsuccess = event => {
+            const matchingRow = event.target.result;
+            if (!matchingRow) {
+                console.error('No row found with text_key:', text_key);
+                callbackFn(false);
+                return;
+            }
+
+            // Now that we have the matching row, we can delete it using its id
+            const deleteRequest = store.delete(matchingRow.id);
+
+            deleteRequest.onerror = event => {
+                console.error('Error deleting data:', event.target.error);
+                callbackFn(false);
+            };
+
+            deleteRequest.onsuccess = event => {
+                console.log('Data deleted successfully');
+                callbackFn(true);
+            };
         };
     }
 }
@@ -163,21 +212,21 @@ export const myDatabase = MyDatabase.getInstance();
 //         });
 //     }
 
-    // add(textKey, data) {
-    //     return new Promise((resolve, reject) => {
-    //         const transaction = this.db.transaction(this.storeName, 'readwrite');
-    //         const store = transaction.objectStore(this.storeName);
-    //         const request = store.add({ textKey, data });
-    //         request.onerror = event => {
-    //             console.error('Error adding data:', event.target.error);
-    //             reject(event.target.error);
-    //         };
-    //         request.onsuccess = event => {
-    //             console.log('Data added successfully:', event.target.result);
-    //             resolve(event.target.result);
-    //         };
-    //     });
-    // }
+// add(textKey, data) {
+//     return new Promise((resolve, reject) => {
+//         const transaction = this.db.transaction(this.storeName, 'readwrite');
+//         const store = transaction.objectStore(this.storeName);
+//         const request = store.add({ textKey, data });
+//         request.onerror = event => {
+//             console.error('Error adding data:', event.target.error);
+//             reject(event.target.error);
+//         };
+//         request.onsuccess = event => {
+//             console.log('Data added successfully:', event.target.result);
+//             resolve(event.target.result);
+//         };
+//     });
+// }
 
 //     getData(textKey, callbackFn) {
 //         const transaction = this.db.transaction(this.storeName, 'readonly');

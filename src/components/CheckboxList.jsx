@@ -25,20 +25,29 @@ export default function CheckboxList() {
     function getAllData() {
         chrome.runtime.sendMessage({ action: 'getAll' }, response => {
             console.log(response);
+            if (response.data === null || response.data === undefined) {
+                console.log('data is undefined or null');
+            }else {
+                setWordArray(response.data);
+            }
         });
     }
+
+    function deleteItem(text_key) {
+        chrome.runtime.sendMessage({ action: 'delete', data: text_key }, response => {
+            console.log(response);
+            if (response.success == false) {
+                console.log('text_key is not found in database');
+            }else {
+                console.log("item deleted successfully");
+                //update the words after delete a item
+                const newWordArray = wordArray.filter((item) => item["text_key"] != text_key)
+                setWordArray(newWordArray)
+            }
+        });
+
+    }
     React.useEffect(() => {
-        // chrome.storage.sync.get(DICT_KEY, result => {
-        //     console.log('storage get result=', result);
-        //     const wordArray = result[DICT_KEY];
-        //     console.log('storage wordArray', wordArray);
-        //     if (wordArray === null || wordArray === undefined) {
-        //         console.log('wordArray is undefined or null');
-        //     } else {
-        //         console.log('wordArray is not empty', wordArray);
-        //         setWordArray(wordArray);
-        //     }
-        // });
         getAllData();
     }, []);
 
@@ -51,12 +60,7 @@ export default function CheckboxList() {
     const handleDeleteItem = text => e => {
         e.stopPropagation();
         console.log('handleDeleteItem text=', text);
-        // const newArray = wordArray.filter(item => item[DICT_ITEM_KEY].join('') !== text);
-        // setWordArray(newArray);
-        // const newDict = { [DICT_KEY]: newArray };
-        // chrome.storage.sync.set(newDict, () => {
-        //     console.log('save wordArray handleDeleteItem', newDict);
-        // });
+        deleteItem(text);
     };
 
     const handleMessageBoxCallback = (data = []) => {
@@ -85,7 +89,7 @@ export default function CheckboxList() {
             <Divider></Divider>
             <List sx={{ width: '100%', minWidth: 400, bgcolor: 'background.paper', overflow: 'auto', height: '450px' }}>
                 {wordArray.map((item, i) => {
-                    const labelId = `words-list-label-${item['text_key'].join('')}-${i}`;
+                    const labelId = `words-list-label-${item['text_key']}-${i}`;
                     const jyutping = item['data'][1].join(' ');
                     const textCharacters = item['data'][0].join('');
                     return (
