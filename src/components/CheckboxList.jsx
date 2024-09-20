@@ -33,6 +33,18 @@ export default function CheckboxList() {
         });
     }
 
+    function deleteAllData() {
+        chrome.runtime.sendMessage({ action: 'deleteAll' }, response => {
+            console.log(response);
+            if (response.success == false) {
+                console.log('error in database');
+            }else {
+                console.log("all data deleted successfully");
+                setWordArray([]);
+            }
+        });
+    }
+
     function deleteItem(text_key) {
         chrome.runtime.sendMessage({ action: 'delete', data: text_key }, response => {
             console.log(response);
@@ -47,6 +59,7 @@ export default function CheckboxList() {
         });
 
     }
+
     React.useEffect(() => {
         getAllData();
     }, []);
@@ -64,19 +77,9 @@ export default function CheckboxList() {
     };
 
     const handleMessageBoxCallback = (data = []) => {
-        // wordArray.length = 0;
-        wordArray.splice(0, wordArray.length);
-        console.log('wordarray:', wordArray);
-        setWordArray([]);
-        chrome.storage.sync.remove([DICT_KEY], () => {
-            console.log('clean storage ', DICT_KEY);
-            // Send a message to content scripts to update the array
-            chrome.tabs.query({}, function (tabs) {
-                tabs.forEach(function (tab) {
-                    chrome.tabs.sendMessage(tab.id, { action: 'updateWordArray', data: [] });
-                });
-            });
-        });
+        // data is no used here
+        data = data; // make compiler happy
+        deleteAllData(); 
     };
 
     return (

@@ -65,21 +65,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     if (request.action === 'delete') {
         console.log('delete ', request.data);
-        myDatabase.delete(request.data, (success) => {
+        myDatabase.delete(request.data, success => {
+            sendResponse({ success });
+        });
+        return true; // Indicates we wish to send a response asynchronously
+    }
+    if (request.action === 'deleteAll') {
+        myDatabase.deleteAll(success => {
             sendResponse({ success });
         });
         return true; // Indicates we wish to send a response asynchronously
     }
 });
-// chrome.runtime.onConnect.addListener(function(port) {
-//     console.assert(port.name === "tts-channel");
-//     port.onMessage.addListener(function(msg) {
-//         if (msg.action === 'TTSStartSpeaking') {
-//             // Start TTS process
-//             startTTS(msg.text, port);
-//         }
-//     });
-// });
 
 function startTTS(text, port) {
     // Example TTS process
@@ -100,21 +97,6 @@ function startTTS(text, port) {
 
     speakWord();
 }
-
-// chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-//     if (request.action === "TTSStartSpeaking") {
-//         let text = request.text;
-//         console.log("bg speak text:", text)
-//         // let ret = speakLongText(text)
-//         speakLongTextWithResponse(text, sendResponse);
-//         // if (ret === true) {
-//         //     sendResponse({ result: true });
-//         // }
-//     } else if (request.action === "TTSStop") {
-//         stopSpeaking()
-//     }
-//     return true; // Keep the message channel open for asynchronous sendResponse
-// });
 
 async function fetchTranslation(text) {
     // https://cn.bing.com/dict/search?mkt=zh-cn&q=

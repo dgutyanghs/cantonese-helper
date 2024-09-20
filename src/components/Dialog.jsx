@@ -45,6 +45,7 @@ function Dialog() {
     const [covertResult, setCovertResult] = React.useState([]);
     const [wordArray, setWordArray] = React.useState([]);
     const [textInWords, setTextInWords] = React.useState(false);
+    const [bingTranslateText, setBingTranslateText] = React.useState("");
 
     const handleClose = () => {
         const newStyle = {
@@ -72,8 +73,6 @@ function Dialog() {
         });
       }
       
-      // Use this function to add data
-    //   addData({id: 1, name: "Test"});
 
     React.useEffect(() => {
         /**
@@ -167,37 +166,10 @@ function Dialog() {
         const textArray = result.keys;
         const jyutArray = result.values;
         const text_key = textArray.join('');
-        const data = [textArray, jyutArray];
+        const data = [textArray, jyutArray, {"translate": bingTranslateText}];
         // console.log("data", data);
 
         addData(text_key, data);
-        // myDatabase.add(text_key, data);
-        // myDatabase.getData(text_key, data => {
-        //     console.log('text_key getData', data);
-        // });
-        // myDatabase.getData("23", data => {
-        //         console.log('23getData', data);
-        // });
-        // myDatabase.getAll(data => {
-        //     console.log('getAll', data);
-        // });
-        /**
-         * Don't add the same word in wordArray
-         */
-        // const arr = wordArray.filter(item => item[DICT_ITEM_KEY].join('') === textArray.join(''));
-        // if (arr.length > 0) {
-        //     console.log('arr is already exist', arr, textArray);
-        //     return;
-        // }
-        // console.log(textArray, jyutArray, 'wordArray=', wordArray);
-        // const newArray = [{ [DICT_ITEM_KEY]: textArray, [DICT_ITEM_VAL]: jyutArray }, ...wordArray];
-        // setWordArray(newArray);
-        // // console.log('Dialog wordArray:', wordArray);
-        // // console.log('Dialog newArray:', newArray);
-        // const newDict = { [DICT_KEY]: newArray };
-        // chrome.storage.sync.set(newDict, () => {
-        //     console.log('switch data is saved', newDict);
-        // });
     };
 
     const stopPassTheEvent = e => e.stopPropagation();
@@ -209,7 +181,7 @@ function Dialog() {
                 </Typography>
                 <hr />
                 <Typography sx={{ fontSize: '0.7rem' }}>
-                    <BingDictScrape text={soundText} />
+                    <BingDictScrape text={soundText} callbackFn={(text) => setBingTranslateText(text)} />
                 </Typography>
                 <Stack direction={'row'} bgcolor={'darkgray'} spacing={4} justifyContent={'center'}>
                     <Tooltip title="speak">

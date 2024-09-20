@@ -108,26 +108,20 @@ class MyDatabase {
         };
     }
 
-    delete2(text_key, callbackFn) {
-        // Check if text_key is valid
-        if (text_key === undefined || text_key === null) {
-            console.error('Invalid key:', text_key);
-            callbackFn(false);
-            return;
-        }
-
+    deleteAll(callbackFn) {
         const transaction = this.db.transaction(this.storeName, 'readwrite');
         const store = transaction.objectStore(this.storeName);
-        const request = store.delete(text_key);
+        const request = store.clear();
         request.onerror = event => {
-            console.error('Error deleting data:', event.target.error);
+            console.error('Error deleting all data:', event.target.error);
             callbackFn(false);
         };
         request.onsuccess = event => {
-            console.log('Data deleted successfully:', event.target.result);
+            console.log('All data deleted successfully');
             callbackFn(true);
         };
     }
+
     delete(text_key, callbackFn) {
         if (!text_key || typeof text_key !== 'string') {
             console.error('Invalid text_key:', text_key);
