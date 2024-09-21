@@ -22,9 +22,27 @@ export const hasHanChar = (s) => {
  * @param {string} s to be covert string. 
  * @returns  array like this style: [['a','1'],['b','2'],['c','3'],...]
  */
-export  const convertText = async (s) => {
+export const convertText = async (s) => {
     // console.log('converting text:', s)
     const conversionResults = await mm.sendMessageMM('convert', s);
     // console.log(`convert ${s} to `, conversionResults)
     return conversionResults
+}
+
+
+
+export const  displayDate = (date) => {
+    if (date === undefined || (date instanceof Date) === false) {
+        console.log('date is undefined or not a date object. ', date);
+        return "";
+    }
+
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    const hour = date.getHours().toString().padStart(2, '0');
+    const minute = date.getMinutes().toString().padStart(2, '0');
+
+    // console.log(`${year}-${month}-${day} ${hour}:${minute}`);
+    return `${year}-${month}-${day} ${hour}:${minute}`;
 }

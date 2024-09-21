@@ -1,6 +1,7 @@
 /**
  * For saving and retrieving user's words from IndexedDB
  */
+
 class MyDatabase {
     static instance;
 
@@ -16,6 +17,22 @@ class MyDatabase {
             MyDatabase.instance = new MyDatabase();
         }
         return MyDatabase.instance;
+    }
+
+    static displayDate(date) {
+        if (date === undefined || (date instanceof Date) === false) {
+            console.log('date is undefined or not a date object. ', date);
+            return "";
+        }
+
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        const hour = date.getHours().toString().padStart(2, '0');
+        const minute = date.getMinutes().toString().padStart(2, '0');
+
+        // console.log(`${year}-${month}-${day} ${hour}:${minute}`);
+        return `${year}-${month}-${day} ${hour}:${minute}`;
     }
 
     open() {
@@ -43,7 +60,9 @@ class MyDatabase {
         return new Promise((resolve, reject) => {
             const transaction = this.db.transaction(this.storeName, 'readwrite');
             const store = transaction.objectStore(this.storeName);
-            const request = store.add({ text_key, data });
+            const dateStr = MyDatabase.displayDate(new Date());
+            // const dateStr = new Date().toISOString();
+            const request = store.add({ text_key, data, date: dateStr });
             request.onerror = event => {
                 console.error('Error adding data:', event.target.error);
                 reject(event.target.error);
@@ -79,20 +98,46 @@ class MyDatabase {
         const transaction = this.db.transaction(this.storeName, 'readonly');
         const store = transaction.objectStore(this.storeName);
         const request = store.getAll();
+
         request.onerror = event => {
             console.error('Error getting all data:', event.target.error);
             if (callbackFn) {
                 callbackFn(null);
             }
         };
+
         request.onsuccess = event => {
-            const result = event.target.result;
-            console.log('All data retrieved successfully:', result);
+            let result = event.target.result;
+
+            // Reverse the order of the result array
+            if (Array.isArray(result)) {
+                result = result.reverse();
+            }
+
+            console.log('All data retrieved and reversed successfully:', result);
             if (callbackFn) {
                 callbackFn(result ? result : null);
             }
         };
     }
+    // getAll(callbackFn) {
+    //     const transaction = this.db.transaction(this.storeName, 'readonly');
+    //     const store = transaction.objectStore(this.storeName);
+    //     const request = store.getAll();
+    //     request.onerror = event => {
+    //         console.error('Error getting all data:', event.target.error);
+    //         if (callbackFn) {
+    //             callbackFn(null);
+    //         }
+    //     };
+    //     request.onsuccess = event => {
+    //         const result = event.target.result;
+    //         console.log('All data retrieved successfully:', result);
+    //         if (callbackFn) {
+    //             callbackFn(result ? result : null);
+    //         }
+    //     };
+    // }
 
     update(text_key, data) {
         const transaction = this.db.transaction(this.storeName, 'readwrite');

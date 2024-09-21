@@ -70,14 +70,14 @@ class TTSpeech {
         let chunks = this.splitChineseSentences(text);
 
         const { utterance } = this;
-        // console.log(`@@utterance=${utterance}`);
+        console.log(`@@utterance=${utterance}`);
         if (utterance.voice == null) {
             let voices = window.speechSynthesis.getVoices();
             let voiceForSpeack = voices.find(voice => voice.lang === SpeechLang);
             utterance.voice = voiceForSpeack;
             // console.log('setVoiceFor zh-CN');
         }
-        // console.log(`@@lang=${utterance.voice.lang}`);
+        console.log(`@@lang=${utterance.voice.lang}`);
         function speakNextChunk(index) {
             if (index < chunks.length) {
                 utterance.text = chunks[index].trim();
@@ -87,7 +87,7 @@ class TTSpeech {
             }
 
             utterance.onend = function (e) {
-                // console.log('@@@Finished in ' + e.elapsedTime + ' seconds.');
+                console.log('@@@Finished in ' + e.elapsedTime + ' seconds.');
                 speakNextChunk(index + 1);
             };
             utterance.onstart = e => {

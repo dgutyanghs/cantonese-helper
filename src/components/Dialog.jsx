@@ -166,7 +166,7 @@ function Dialog() {
         const textArray = result.keys;
         const jyutArray = result.values;
         const text_key = textArray.join('');
-        const data = [textArray, jyutArray, {"translate": bingTranslateText}];
+        const data = [textArray.join(''), jyutArray.join(' '), {"meaning": bingTranslateText}];
         // console.log("data", data);
 
         addData(text_key, data);

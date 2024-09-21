@@ -6,7 +6,7 @@ function Options() {
     const theme = useTheme();
     return (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', position: 'relative' }}>
-            <Box sx={{ width: 180, bgcolor: 'lightgrey', borderRight: `1px solid ${theme.palette.divider}` }}>
+            {/* <Box sx={{ width: 180, bgcolor: 'lightgrey', borderRight: `1px solid ${theme.palette.divider}` }}>
                 <Typography sx={{ mt: '20px', height: '80px' }} variant="h6" color="primary" textAlign="center">
                     Chinese Study <br />
                     <span style={{ fontSize: '0.75rem' }}>Jyutping for Cantonese</span>
@@ -28,8 +28,8 @@ function Options() {
                     </Typography>
                 </Stack>
                 <Divider />
-            </Box>
-            <Box sx={{ width: 600 }}>
+            </Box> */}
+            <Box sx={{ width: 1200 }}>
                 <Box sx={{ bgcolor: 'lightblue', textAlign: 'center', pb: '20px' }}>
                     <Typography variant="h3" color="primary">
                         Words
