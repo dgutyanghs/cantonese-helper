@@ -7,7 +7,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DICT_KEY } from '../constant';
 
-function MessageBox({data, onDataUpdate}) {
+function MessageBox({rows, onDataUpdate}) {
     const [open, setOpen] = useState(false);
 
     const handleClickOpen = () => {
@@ -19,25 +19,21 @@ function MessageBox({data, onDataUpdate}) {
     };
 
     const handleOk = () => {
-        console.log('OK, data:',data);
+        console.log('MessageBox rows:',rows);
 
-        // if (Array.isArray(data)) {
-        //     data.length = 0;
-        //     console.log("empty the data array");
-        // }
         setOpen(false);
-        onDataUpdate(); //info the parent component by callback
+        onDataUpdate(rows); //info the parent component by callback
     };
 
     return (
         <div>
             <Button endIcon={<DeleteIcon />} variant="contained" color="error" onClick={handleClickOpen}>
-                Delete All
+                Delete Selected Rows
             </Button>
             <Dialog open={open} onClose={handleCancel} aria-labelledby="alert-dialog-title" aria-describedby="alert-dialog-description">
                 <DialogContent>
                     <DialogContentText id="alert-dialog-description">
-                        Are you sure to delete all words?
+                        Are you sure to delete  selected rows?
                     </DialogContentText>
                 </DialogContent>
                 <DialogActions>

@@ -76,6 +76,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         });
         return true; // Indicates we wish to send a response asynchronously
     }
+    if (request.action === 'deleteIds') {
+        myDatabase.deleteIds(request.data, success => {
+            console.log("request.action === 'deleteIds'", success);
+            sendResponse({ success });
+        });
+        return true; // Indicates we wish to send a response asynchronously
+    }
 });
 
 function startTTS(text, port) {

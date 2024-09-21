@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DICT_ITEM_KEY, DICT_ITEM_VAL, DICT_KEY } from '../constant';
-import { Box, Divider } from '@mui/material';
+import { Box, Divider, Typography } from '@mui/material';
 import TTSpeech from '../tts';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -16,9 +16,22 @@ import MessageBox from './MessageBox';
 import Tooltip from '@mui/material/Tooltip';
 import DownloadIcon from '@mui/icons-material/Download';
 import CSvExport from './CsvExport';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridFooterContainer, GridToolbarContainer } from '@mui/x-data-grid';
 // import { myDatabase } from '../database';
-
+const CustomPagination = () => (
+    <GridFooterContainer>
+        <GridToolbarContainer>
+            {({ state }) => {
+                const { pagination } = state;
+                const { page, pageSize, rowCount } = pagination;
+                const start = (page - 1) * pageSize + 1;
+                const end = Math.min(page * pageSize, rowCount);
+                const message = `Displaying rows ${start} to ${end} of ${rowCount}`;
+                return <div>{message}</div>;
+            }}
+        </GridToolbarContainer>
+    </GridFooterContainer>
+);
 
 const columns = [
     { field: 'id', headerName: 'ID', width: 40 },
@@ -34,11 +47,10 @@ const columns = [
         width: 450,
         editable: false,
         renderCell: (params) => (
-            <div>
-                <Tooltip title="Click to speak" arrow>
-                        {params.value}
-                </Tooltip>
-            </div>
+                <Stack   sx={{ cursor: 'pointer', bgcolor: 'lightblue', justifyContent: "flex-start", alignItems: "center" }}>
+                    <VolumeUpIcon color='primary' />
+                    <Typography >{params.value}</Typography>
+                </Stack>
         )
     },
     {
@@ -62,9 +74,22 @@ const columns = [
 
 
 export default function CheckboxList() {
-    const [wordArray, setWordArray] = React.useState([]);
     const [rows, setRows] = React.useState([])
+    const [selectedRows, setSelectedRows] = React.useState([])
 
+
+    const handleSelectionModelChange = (selectionModel) => {
+        // If the header checkbox is selected, it will be included in the selectionModel
+        // but it doesn't represent a real row, so we need to remove it
+        console.log("selectionModel", selectionModel);
+
+        setSelectedRows(selectionModel);
+
+    };
+
+    const handleDeleteSelectedRows = () => {
+        console.log("delete selected rows");
+    }
 
     function getAllData() {
         chrome.runtime.sendMessage({ action: 'getAll' }, response => {
@@ -72,7 +97,6 @@ export default function CheckboxList() {
             if (response.data === null || response.data === undefined) {
                 console.log('data is undefined or null');
             } else {
-                // setWordArray(response.data);
                 const newWordArray = response.data
                 const newRows = newWordArray.map((item) => {
                     return {
@@ -96,25 +120,41 @@ export default function CheckboxList() {
                 console.log('error in database');
             } else {
                 console.log("all data deleted successfully");
-                setWordArray([]);
+                setRows([])
             }
         });
     }
 
-    function deleteItem(text_key) {
-        chrome.runtime.sendMessage({ action: 'delete', data: text_key }, response => {
+    function deleteIds(idsArray) {
+        console.log("deleteIds, idsArray=", idsArray);
+        chrome.runtime.sendMessage({ action: 'deleteIds', data: idsArray }, response => {
             console.log(response);
             if (response.success == false) {
-                console.log('text_key is not found in database');
+                console.log('error in database');
             } else {
-                console.log("item deleted successfully");
-                //update the words after delete a item
-                const newWordArray = wordArray.filter((item) => item["text_key"] != text_key)
-                setWordArray(newWordArray)
+                console.log(" idsArray deleted successfully");
+
+                const newRows = rows.filter((item) => (!idsArray.includes(item["id"])))
+                console.log("deleteIds, newRows=", newRows);
+                setRows(newRows);
             }
         });
-
     }
+
+    // function deleteItem(text_key) {
+    //     chrome.runtime.sendMessage({ action: 'delete', data: text_key }, response => {
+    //         console.log(response);
+    //         if (response.success == false) {
+    //             console.log('text_key is not found in database');
+    //         } else {
+    //             console.log("item deleted successfully");
+    //             //update the words after delete a item
+    //             const newWordArray = wordArray.filter((item) => item["text_key"] != text_key)
+    //             setWordArray(newWordArray)
+    //         }
+    //     });
+
+    // }
 
     React.useEffect(() => {
         getAllData();
@@ -131,10 +171,18 @@ export default function CheckboxList() {
         deleteItem(text);
     };
 
-    const handleMessageBoxCallback = (data = []) => {
+    const handleMessageBoxCallback = (messageRowIDs) => {
+        if (messageRowIDs.length == 0 || messageRowIDs === undefined || messageRowIDs === null) {
+           return 
+        }
         // data is no used here
-        data = data; // make compiler happy
-        deleteAllData();
+        // data = data; // make compiler happy
+        console.log("handleMessageBoxCallback, messageRowIDs", messageRowIDs);
+        if (messageRowIDs.length == rows.length) {
+            deleteAllData();
+        } else {
+            deleteIds(messageRowIDs);
+        }
     };
 
     return (
@@ -143,102 +191,25 @@ export default function CheckboxList() {
                 <DataGrid
                     rows={rows}
                     columns={columns}
-                    initialState={{
-                        pagination: {
-                            paginationModel: {
-                                pageSize: 5,
-                            },
-                        },
-                    }}
-                    pageSizeOptions={[5]}
                     checkboxSelection
                     disableRowSelectionOnClick
                     onCellClick={(e) => {
+                        if (e.field !== 'jyutping') {
+                            return
+                        }
                         const text = e.row.character
-                        console.log("TTSpeech:", text)
                         handlePlaySound(text);
 
                     }}
+                    onRowSelectionModelChange={handleSelectionModelChange}
+                    components={{
+                        Pagination: CustomPagination,
+                    }}
                 />
+
+                <MessageBox rows={selectedRows} onDataUpdate={handleMessageBoxCallback}></MessageBox>
             </Box>
         )
     )
 
-    // return (
-    //     <Box sx={{ bgcolor: 'lightgrey' }}>
-    //         <Divider></Divider>
-    //         <Stack mr="10px" my="10px" direction="row" justifyContent="flex-end" spacing="40px">
-    //             <CSvExport data={wordArray} />
-    //             <MessageBox data={wordArray} onDataUpdate={handleMessageBoxCallback}></MessageBox>
-    //         </Stack>
-    //         <Divider></Divider>
-    //         <List sx={{ width: '100%', minWidth: 400, bgcolor: 'background.paper', overflow: 'auto', height: '450px' }}>
-    //             {wordArray.map((item, i) => {
-    //                 const labelId = `words-list-label-${item['text_key']}-${i}`;
-    //                 const jyutping = item['data'][1].join(' ');
-    //                 const textCharacters = item['data'][0].join('');
-    //                 return (
-    //                     <ListItem
-    //                         onClick={e => {
-    //                             // console.log('onClick e.target value', e.target.innerHTML);
-    //                             TTSpeech.getInstance().speakLong(textCharacters);
-    //                         }}
-    //                         sx={{
-    //                             'maxHeight': 56,
-    //                             'bgcolor': `${i % 2 == 0 ? '#D0D0D0' : '#DCDCDC'}`,
-    //                             '&:hover': {
-    //                                 backgroundColor: 'lightblue',
-    //                             },
-    //                         }}
-    //                         key={labelId}
-    //                         secondaryAction={
-    //                             <Box>
-    //                                 <Tooltip title="speak">
-    //                                     <IconButton onClick={handlePlaySound(textCharacters)} edge="end" aria-label="speak">
-    //                                         <VolumeUpIcon color="primary" />
-    //                                     </IconButton>
-    //                                 </Tooltip>
-    //                                 <Tooltip title="delete">
-    //                                     <IconButton
-    //                                         onClick={handleDeleteItem(textCharacters)}
-    //                                         sx={{ ml: 2 }}
-    //                                         edge="end"
-    //                                         aria-label="delete"
-    //                                     >
-    //                                         <DeleteIcon style={{ color: 'red' }} />
-    //                                     </IconButton>
-    //                                 </Tooltip>
-    //                             </Box>
-    //                         }
-    //                         disablePadding
-    //                     >
-    //                         <ListItemButton role={undefined} dense>
-    //                             <ListItemText
-    //                                 primaryTypographyProps={{
-    //                                     style: {
-    //                                         whiteSpace: 'nowrap',
-    //                                         overflow: 'hidden',
-    //                                         textOverflow: 'ellipsis',
-    //                                     },
-    //                                 }}
-    //                                 primary={textCharacters}
-    //                             />
-    //                             <ListItemText
-    //                                 primaryTypographyProps={{
-    //                                     style: {
-    //                                         whiteSpace: 'nowrap',
-    //                                         overflow: 'hidden',
-    //                                         textOverflow: 'ellipsis',
-    //                                     },
-    //                                 }}
-    //                                 // id={key}
-    //                                 primary={jyutping}
-    //                             />
-    //                         </ListItemButton>
-    //                     </ListItem>
-    //                 );
-    //             })}
-    //         </List>
-    //     </Box>
-    // );
 }

@@ -77,7 +77,7 @@ class TTSpeech {
             utterance.voice = voiceForSpeack;
             // console.log('setVoiceFor zh-CN');
         }
-        console.log(`@@lang=${utterance.voice.lang}`);
+        // console.log(`@@lang=${utterance.voice.lang}`);
         function speakNextChunk(index) {
             if (index < chunks.length) {
                 utterance.text = chunks[index].trim();
@@ -87,7 +87,7 @@ class TTSpeech {
             }
 
             utterance.onend = function (e) {
-                console.log('@@@Finished in ' + e.elapsedTime + ' seconds.');
+                // console.log('@@@Finished in ' + e.elapsedTime + ' seconds.');
                 speakNextChunk(index + 1);
             };
             utterance.onstart = e => {

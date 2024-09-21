@@ -120,24 +120,6 @@ class MyDatabase {
             }
         };
     }
-    // getAll(callbackFn) {
-    //     const transaction = this.db.transaction(this.storeName, 'readonly');
-    //     const store = transaction.objectStore(this.storeName);
-    //     const request = store.getAll();
-    //     request.onerror = event => {
-    //         console.error('Error getting all data:', event.target.error);
-    //         if (callbackFn) {
-    //             callbackFn(null);
-    //         }
-    //     };
-    //     request.onsuccess = event => {
-    //         const result = event.target.result;
-    //         console.log('All data retrieved successfully:', result);
-    //         if (callbackFn) {
-    //             callbackFn(result ? result : null);
-    //         }
-    //     };
-    // }
 
     update(text_key, data) {
         const transaction = this.db.transaction(this.storeName, 'readwrite');
@@ -166,6 +148,59 @@ class MyDatabase {
             callbackFn(true);
         };
     }
+
+    deleteIds(idsArray, callbackFn) {
+        if (callbackFn === undefined) {
+            console.error('callbackFn is undefined');
+            return;
+        }
+
+        if (!idsArray || !Array.isArray(idsArray) || idsArray.length === 0) {
+            console.error('Invalid or empty idsArray:', idsArray);
+            callbackFn(false);
+            return;
+        }
+
+        const transaction = this.db.transaction(this.storeName, 'readwrite');
+        const store = transaction.objectStore(this.storeName);
+        const request = store.delete(idsArray);
+
+        request.onerror = event => {
+            console.error('Error deleting data:', event.target.error);
+            transaction.abort();
+            callbackFn(false);
+        };
+
+        request.onsuccess = event => {
+            console.log('Data deleted successfully', event);
+            callbackFn(true);
+        };
+    }
+    deleteIds2(idsArray, callbackFn) {
+        if (callbackFn === undefined) {
+            console.error('callbackFn is undefined');
+            return;
+        }
+
+        if (!idsArray || !Array.isArray(idsArray)) {
+            console.error('Invalid idsArray:', idsArray);
+            callbackFn(false);
+            return;
+        }
+
+        const transaction = this.db.transaction(this.storeName, 'readwrite');
+        const store = transaction.objectStore(this.storeName);
+        const request = store.delete(idsArray);
+        request.onerror = event => {
+            console.error('Error deleting data:', event.target.error);
+            callbackFn(false);
+        };
+        request.onsuccess = event => {
+            console.log('Data deleted successfully');
+            callbackFn(true);
+        };
+    }
+
 
     delete(text_key, callbackFn) {
         if (!text_key || typeof text_key !== 'string') {
