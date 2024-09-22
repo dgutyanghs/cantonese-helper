@@ -163,42 +163,28 @@ class MyDatabase {
 
         const transaction = this.db.transaction(this.storeName, 'readwrite');
         const store = transaction.objectStore(this.storeName);
-        const request = store.delete(idsArray);
 
-        request.onerror = event => {
-            console.error('Error deleting data:', event.target.error);
-            transaction.abort();
-            callbackFn(false);
-        };
+        let deletedCount = 0;
 
-        request.onsuccess = event => {
-            console.log('Data deleted successfully', event);
+        transaction.oncomplete = () => {
+            console.log(`${deletedCount} items deleted successfully`);
             callbackFn(true);
         };
-    }
-    deleteIds2(idsArray, callbackFn) {
-        if (callbackFn === undefined) {
-            console.error('callbackFn is undefined');
-            return;
-        }
 
-        if (!idsArray || !Array.isArray(idsArray)) {
-            console.error('Invalid idsArray:', idsArray);
-            callbackFn(false);
-            return;
-        }
-
-        const transaction = this.db.transaction(this.storeName, 'readwrite');
-        const store = transaction.objectStore(this.storeName);
-        const request = store.delete(idsArray);
-        request.onerror = event => {
-            console.error('Error deleting data:', event.target.error);
+        transaction.onerror = (event) => {
+            console.error('Transaction error:', event.target.error);
             callbackFn(false);
         };
-        request.onsuccess = event => {
-            console.log('Data deleted successfully');
-            callbackFn(true);
-        };
+
+        idsArray.forEach((id) => {
+            const request = store.delete(id);
+            request.onsuccess = () => {
+                deletedCount++;
+            };
+            request.onerror = (event) => {
+                console.error(`Error deleting id ${id}:`, event.target.error);
+            };
+        });
     }
 
 
