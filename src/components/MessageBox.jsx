@@ -11,6 +11,9 @@ function MessageBox({rows, onDataUpdate}) {
     const [open, setOpen] = useState(false);
 
     const handleClickOpen = () => {
+        if (rows.length === 0) {
+            return;
+        }
         setOpen(true);
     };
 

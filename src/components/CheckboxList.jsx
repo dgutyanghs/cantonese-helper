@@ -8,7 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { DICT_ITEM_KEY, DICT_ITEM_VAL, DICT_KEY } from '../constant';
-import { Box, Divider, Typography } from '@mui/material';
+import { Box, Divider, ThemeProvider, Typography } from '@mui/material';
 import TTSpeech from '../tts';
 import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
@@ -17,21 +17,7 @@ import Tooltip from '@mui/material/Tooltip';
 import DownloadIcon from '@mui/icons-material/Download';
 import CSvExport from './CsvExport';
 import { DataGrid, GridFooterContainer, GridToolbarContainer } from '@mui/x-data-grid';
-// import { myDatabase } from '../database';
-const CustomPagination = () => (
-    <GridFooterContainer>
-        <GridToolbarContainer>
-            {({ state }) => {
-                const { pagination } = state;
-                const { page, pageSize, rowCount } = pagination;
-                const start = (page - 1) * pageSize + 1;
-                const end = Math.min(page * pageSize, rowCount);
-                const message = `Displaying rows ${start} to ${end} of ${rowCount}`;
-                return <div>{message}</div>;
-            }}
-        </GridToolbarContainer>
-    </GridFooterContainer>
-);
+
 
 const columns = [
     { field: 'id', headerName: 'ID', width: 40 },
@@ -47,10 +33,10 @@ const columns = [
         width: 450,
         editable: false,
         renderCell: (params) => (
-                <Stack   sx={{ cursor: 'pointer', bgcolor: 'lightblue', justifyContent: "flex-start", alignItems: "center" }}>
-                    <VolumeUpIcon color='primary' />
-                    <Typography >{params.value}</Typography>
-                </Stack>
+            <Stack direction={"row"} spacing={1} alignItems={"center"} sx={{ width: '100%', height: '100%', cursor: 'pointer' }}>
+                <VolumeUpIcon color='primary' />
+                <Typography sx={{ flexGrow: 1 }}>{params.value}</Typography>
+            </Stack>
         )
     },
     {
@@ -80,7 +66,6 @@ export default function CheckboxList() {
 
     const handleSelectionModelChange = (selectionModel) => {
         // If the header checkbox is selected, it will be included in the selectionModel
-        // but it doesn't represent a real row, so we need to remove it
         console.log("selectionModel", selectionModel);
 
         setSelectedRows(selectionModel);
@@ -141,20 +126,6 @@ export default function CheckboxList() {
         });
     }
 
-    // function deleteItem(text_key) {
-    //     chrome.runtime.sendMessage({ action: 'delete', data: text_key }, response => {
-    //         console.log(response);
-    //         if (response.success == false) {
-    //             console.log('text_key is not found in database');
-    //         } else {
-    //             console.log("item deleted successfully");
-    //             //update the words after delete a item
-    //             const newWordArray = wordArray.filter((item) => item["text_key"] != text_key)
-    //             setWordArray(newWordArray)
-    //         }
-    //     });
-
-    // }
 
     React.useEffect(() => {
         getAllData();
@@ -173,10 +144,8 @@ export default function CheckboxList() {
 
     const handleMessageBoxCallback = (messageRowIDs) => {
         if (messageRowIDs.length == 0 || messageRowIDs === undefined || messageRowIDs === null) {
-           return 
+            return
         }
-        // data is no used here
-        // data = data; // make compiler happy
         console.log("handleMessageBoxCallback, messageRowIDs", messageRowIDs);
         if (messageRowIDs.length == rows.length) {
             deleteAllData();
@@ -187,27 +156,35 @@ export default function CheckboxList() {
 
     return (
         (
-            <Box sx={{ height: 600, width: '100%' }}>
+            <Box sx={{ height: 600, width: '100%', background: 'linear-gradient(to bottom, lightgrey, darkgrey)' }} >
                 <DataGrid
                     rows={rows}
                     columns={columns}
                     checkboxSelection
                     disableRowSelectionOnClick
+                    hideFooterPagination
                     onCellClick={(e) => {
                         if (e.field !== 'jyutping') {
                             return
                         }
                         const text = e.row.character
                         handlePlaySound(text);
-
                     }}
                     onRowSelectionModelChange={handleSelectionModelChange}
-                    components={{
-                        Pagination: CustomPagination,
+                    sx={{
+                        '& .MuiDataGrid-columnHeaders': {
+                            backgroundColor: 'black',
+                            color: 'orange', // optional, to change the text color
+                            fontSize: '20px',
+                        },
                     }}
                 />
+                <Divider />
 
-                <MessageBox rows={selectedRows} onDataUpdate={handleMessageBoxCallback}></MessageBox>
+                <Stack mr="10px" my="10px" direction="row" justifyContent="flex-start" spacing="40px">
+                    <MessageBox rows={selectedRows} onDataUpdate={handleMessageBoxCallback}></MessageBox>
+                    <CSvExport data={rows} />
+                </Stack>
             </Box>
         )
     )
