@@ -117,6 +117,24 @@ async function fetchTranslation(text) {
     return html;
 }
 
+// for menu context
+chrome.runtime.onInstalled.addListener(function () {
+    chrome.contextMenus.create({
+        "id": "cantonese-menu-item",
+        "title": "Go to Words Page",
+        "contexts": ["all"]
+    });
+});
+
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId === "cantonese-menu-item") {
+    console.log("Context menu item clicked!");
+    // Add your functionality here
+    chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
+  }
+});
+
 /**
  * initial database
  */

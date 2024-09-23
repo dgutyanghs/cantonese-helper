@@ -1,7 +1,7 @@
 {
     "name": "__MSG_extensionName__",
     "manifest_version": 3,
-    "version": "2.1.5",
+    "version": "2.1.6",
     "default_locale": "en",
     "description": "__MSG_extensionDescription__",
     "icons": {
@@ -11,9 +11,15 @@
     },
     "content_scripts": [
         {
-            "matches": ["<all_urls>"],
-            "js": ["contentScript.js"],
-            "css": ["./css/contentScript.css"],
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "contentScript.js"
+            ],
+            "css": [
+                "./css/contentScript.css"
+            ],
             "all_frames": false,
             "run_at": "document_end"
         }
@@ -21,7 +27,11 @@
     "background": {
         "service_worker": "serviceWorker.js"
     },
-    "permissions": ["storage", "tts"],
+    "permissions": [
+        "storage",
+        "tts",
+        "contextMenus"
+    ],
     "action": {
         "default_icon": "icons/96.png",
         "default_title": "__MSG_extensionName__",
@@ -29,8 +39,15 @@
     },
     "web_accessible_resources": [
         {
-            "resources": ["dictionary.json.txt", "web_accessible_resources.js", "contentScript.css"],
-            "matches": ["https://*/*", "http://*/*"]
+            "resources": [
+                "dictionary.json.txt",
+                "web_accessible_resources.js",
+                "contentScript.css"
+            ],
+            "matches": [
+                "https://*/*",
+                "http://*/*"
+            ]
         }
     ],
     "tts_engine": {
@@ -38,10 +55,16 @@
             {
                 "voice_name": "Cantonese Voice",
                 "lang": "yue-Hant-HK",
-                "event_types": ["start", "marker", "end"]
+                "event_types": [
+                    "start",
+                    "marker",
+                    "end"
+                ]
             }
         ]
     },
     "options_page": "options.html",
-    "host_permissions": ["https://cn.bing.com/dict/"]
+    "host_permissions": [
+        "https://cn.bing.com/dict/"
+    ]
 }

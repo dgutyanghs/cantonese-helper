@@ -55,7 +55,7 @@ function App() {
             </Box>
             <Box sx={{ mt: 12, mb: 2, mx: 'auto', textAlign: 'center' }}>
                 <Button onClick={gotoOptions} size="small" variant="contained" endIcon={<SendIcon />}>
-                    Words
+                    Show Words
                 </Button>
             </Box>
         </Box>

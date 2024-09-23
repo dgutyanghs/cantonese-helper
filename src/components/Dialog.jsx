@@ -6,7 +6,7 @@ import { nanoid } from 'nanoid';
 import TTSpeech from '../tts.js';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { IconButton, Stack } from '@mui/material';
+import { Divider, IconButton, Stack } from '@mui/material';
 import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
@@ -66,13 +66,13 @@ function Dialog() {
     };
 
     function addData(text_key, data) {
-        chrome.runtime.sendMessage({action: "add", text_key: text_key, data: data}, (response) => {
-          if (response.success) {
-            console.log("Data added successfully");
-          }
+        chrome.runtime.sendMessage({ action: "add", text_key: text_key, data: data }, (response) => {
+            if (response.success) {
+                console.log("Data added successfully");
+            }
         });
-      }
-      
+    }
+
 
     React.useEffect(() => {
         /**
@@ -166,7 +166,7 @@ function Dialog() {
         const textArray = result.keys;
         const jyutArray = result.values;
         const text_key = textArray.join('');
-        const data = [textArray.join(''), jyutArray.join(' '), {"meaning": bingTranslateText}];
+        const data = [textArray.join(''), jyutArray.join(' '), { "meaning": bingTranslateText }];
         // console.log("data", data);
 
         addData(text_key, data);
@@ -200,7 +200,10 @@ function Dialog() {
                         </IconButton>
                     </Tooltip>
                 </Stack>
-                <hr />
+                <Typography sx={{ fontSize: '0.7rem', color: 'lightgray' }}>
+                    {"press '+' to add to words page."}
+                </Typography>
+                <Divider />
                 <Typography sx={{ fontSize: '0.7rem' }}>
                     <TranslateLink soundText={soundText} />
                 </Typography>

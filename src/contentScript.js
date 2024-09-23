@@ -84,14 +84,16 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     }
 });
 
+
+
 const init = async () => {
     //check ON or OFF switch in popup.html .
     const isON = await getSwitchState(SWITCH_POPUP);
     if (!isON) {
         console.log('contentscript, switch_popup isON =', isON);
         return;
-    }else {
-        console.log('contentscript, isOn=',isON)
+    } else {
+        console.log('contentscript, isOn=', isON)
     }
 
     keyForMouseSelected = await getKeyForMouseSelected(MOUSE_AND_KEY);
