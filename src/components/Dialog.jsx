@@ -11,7 +11,7 @@ import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
-import { ClassSharp, Opacity } from '@mui/icons-material';
+import { ClassSharp, Opacity, Padding } from '@mui/icons-material';
 import { lightBlue } from '@mui/material/colors';
 import {
     DICT_KEY,
@@ -25,19 +25,26 @@ import {
 import TranslateLink from './TranslateLink';
 import BingDictScrape from './BingDictScrape';
 import { keyForMouseSelected } from '../contentScript.js';
+import shadows from '@mui/material/styles/shadows.js';
 // import { myDatabase } from '../database.js';
+
 
 const oriStyle = {
     position: 'absolute',
-    border: '1px solid #000',
+    border: '1px solid #AAA',
     boxShadow: 24,
-    p: 4,
+    p: '0px 20px 20px 20px',
     display: 'none',
-    // bgcolor: 'success.light'
-    bgcolor: 'background.paper',
+    // bgcolor: 'background.paper',
+    background: 'linear-gradient(126deg, rgba(164,205,251,1) 35%, rgba(99,148,252,1) 93%)',
     zIndex: 10001,
     maxWidth: 500,
     minWidth: 200,
+    transition: 'opacity 0.3s ease-in-out',
+    opacity: '0',
+    borderRadius: '20px',
+    shadows: '10px 10px 10px 10px',
+    // pointerEvents: 'none',
 };
 
 function Dialog() {
@@ -45,26 +52,58 @@ function Dialog() {
     const [soundText, setSoundText] = React.useState('你好');
     const [modalStyle, setModalStyle] = React.useState(oriStyle);
     const [covertResult, setCovertResult] = React.useState([]);
-    const [wordArray, setWordArray] = React.useState([]);
-    const [textInWords, setTextInWords] = React.useState(false);
+    // const [wordArray, setWordArray] = React.useState([]);
+    const [textInWords, setTextInWords] = React.useState(false); // user add this text or not
     const [bingTranslateText, setBingTranslateText] = React.useState("");
+    const [isVisible, setIsVisible] = React.useState(false); // for animation of dialog
+
+    const currentStyle = {
+        ...modalStyle,
+        opacity: isVisible ? 1 : 0,
+        // pointerEvents: isVisible ? 'auto' : 'none',
+    };
+    // const handleClose = () => {
+    //     const newStyle = {
+    //         ...oriStyle,
+    //         display: 'none',
+    //         opacity: '0',
+    //     };
+    //     setModalStyle(newStyle);
+    //     setTextInWords(false);
+    // };
+    // const handleOpen = pos => {
+    //     const newStyle = {
+    //         ...oriStyle,
+    //         top: `${pos.y}px`,
+    //         left: `${pos.x}px`,
+    //         display: 'block',
+    //         opacity: '1',
+    //     };
+    //     setModalStyle(newStyle);
+    // };
 
     const handleClose = () => {
-        const newStyle = {
-            ...oriStyle,
+        setIsVisible(false);
+        // setTimeout(() => {
+        setModalStyle(prevStyle => ({
+            ...prevStyle,
             display: 'none',
-        };
-        setModalStyle(newStyle);
+        }));
         setTextInWords(false);
+        // }, 3000); // This should match the transition duration
     };
+
     const handleOpen = pos => {
-        const newStyle = {
-            ...oriStyle,
+        setModalStyle(prevStyle => ({
+            ...prevStyle,
             top: `${pos.y}px`,
             left: `${pos.x}px`,
             display: 'block',
-        };
-        setModalStyle(newStyle);
+        }));
+        // Use setTimeout to ensure the display change has taken effect
+        setTimeout(() => {
+            setIsVisible(true);
+        }, 10);
     };
 
     function addData(text_key, data) {
@@ -80,13 +119,14 @@ function Dialog() {
         /**
          * In option.html, user maybe delete all words, when happened, update the wordArray in contentscript.js
          */
-        chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-            if (request.action === 'updateWordArray') {
-                const wordArrayOption = request.data;
-                setWordArray(wordArrayOption);
-                console.log('get message, wordArray updated:', wordArrayOption);
-            }
-        });
+        // chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+        //     if (request.action === 'updateWordArray') {
+        //         const wordArrayOption = request.data;
+        //         setWordArray(wordArrayOption);
+        //         console.log('get message, wordArray updated:', wordArrayOption);
+        //     }
+        // });
+
         window.addEventListener('message', async event => {
             const { origin, data } = event;
             const { key, val, type } = data;
@@ -96,7 +136,7 @@ function Dialog() {
                 return;
             }
 
-            console.log('!!!@@@', key, val, type);
+            // console.log('!!!@@@', key, val, type);
             switch (key) {
                 case 'selection':
                     let { x, y, text } = val;
@@ -143,7 +183,7 @@ function Dialog() {
                     }
                     break;
                 case 'empty':
-                    console.log('receive mssage,select empty');
+                    console.log('!!!receive mssage, select empty');
                     handleClose();
                     break;
                 default:
@@ -180,8 +220,9 @@ function Dialog() {
     const stopPassTheEvent = e => e.stopPropagation();
     return (
         <div id="jyutpingpopupdialogid">
-            <Box onMouseUp={stopPassTheEvent} sx={modalStyle}>
-                <Typography id="modal-modal-title" variant="h6" component="h2" sx={{ mt: 2, color: 'black', fontSize: '1rem' }}>
+            {/* <Box onMouseUp={stopPassTheEvent} sx={modalStyle}> */}
+            <Box onMouseUp={stopPassTheEvent} sx={currentStyle}>
+                <Typography variant='h5' sx={{ mt: 2, color: 'white' }}>
                     {allText}
                 </Typography>
                 <hr />
