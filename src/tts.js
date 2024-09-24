@@ -70,12 +70,12 @@ class TTSpeech {
         let chunks = this.splitChineseSentences(text);
 
         const { utterance } = this;
-        console.log(`@@utterance=${utterance}`);
+        // console.log(`@@utterance=${utterance}`);
         if (utterance.voice == null) {
             let voices = window.speechSynthesis.getVoices();
             let voiceForSpeack = voices.find(voice => voice.lang === SpeechLang);
             utterance.voice = voiceForSpeack;
-            // console.log('setVoiceFor zh-CN');
+            console.log('setVoiceFor :', SpeechLang);
         }
         // console.log(`@@lang=${utterance.voice.lang}`);
         function speakNextChunk(index) {
@@ -108,9 +108,9 @@ class TTSpeech {
         // console.log(`@@utterance=${utterance}`);
         if (utterance.voice == null) {
             let voices = window.speechSynthesis.getVoices();
-            let voiceForZH_CN = voices.find(voice => voice.lang === SpeechLang);
-            utterance.voice = voiceForZH_CN;
-            console.log('setVoiceFor zh-CN');
+            let voiceForZH_HK = voices.find(voice => voice.lang === SpeechLang);
+            utterance.voice = voiceForZH_HK;
+            console.log('setVoiceFor ', SpeechLang);
         }
         // console.log(`@@lang=${utterance.voice.lang}`);
         utterance.text = text;
@@ -127,9 +127,10 @@ class TTSpeech {
 
 window.speechSynthesis.onvoiceschanged = function () {
     let voices = window.speechSynthesis.getVoices();
-    console.log(' onvoiceschanged voices=', voices);
-    let voiceForZH_CN = voices.find(voice => voice.lang === SpeechLang);
-    TTSpeech.getInstance().utterance.voice = voiceForZH_CN;
+    // console.log(' onvoiceschanged voices=', voices);
+    let voiceForZH_HK = voices.find(voice => voice.lang === SpeechLang);
+    TTSpeech.getInstance().utterance.voice = voiceForZH_HK;
+    console.log(' onvoiceschanged setVoiceFor ', SpeechLang);
 };
 
 export default TTSpeech;

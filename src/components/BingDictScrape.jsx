@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Typography } from '@mui/material';
 
 const BingDictScrape = ({ text, callbackFn }) => {
-    const [translation, setTranslation] = useState('');
+    const [translation, setTranslation] = useState('Translating...');
 
     // Function to concatenate the text content of each node
     function extractTextContent(node) {
@@ -34,7 +35,8 @@ const BingDictScrape = ({ text, callbackFn }) => {
         });
     }, [text]);
 
-    return <span style={{ color:'grey'}}>{translation}</span>;
+    // return <span style={{ color:'grey'}}>{translation}</span>;
+    return <Typography variant='caption' sx={{ color: 'grey', height: '20px' }}>{translation}</Typography>;
 };
 
 export default BingDictScrape;

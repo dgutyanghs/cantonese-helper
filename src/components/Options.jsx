@@ -12,15 +12,15 @@ const darkTheme = createTheme({
 function Options() {
     // const theme = useTheme();
     return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', position: 'relative',   }}>
-                <Box sx={{ maxWidth: 1200,  p: '20px' }}>
-                    <Box sx={{ background:'linear-gradient(to right, #f5d442, #f59c42)', textAlign: 'center', pb: '20px' }}>
-                        <Typography variant="h3" color="#631296">
-                            Words
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'flex-start', position: 'relative'}}>
+                <Box sx={{ maxWidth: 1200 }}>
+                    <Box sx={{ background:'linear-gradient(to right, lightblue, blue)', textAlign: 'center', pb: '20px' }}>
+                        <Typography variant="h3" color="white" fontWeight={'bold'} sx={{ pt: '20px' }}>
+                            Cantonese Helper
                         </Typography>
-                        <Typography color="grey">All words are added from web pages</Typography>
+                        <Typography color="white">Words you "+" from web pages</Typography>
                         <Typography variant="strong" color="primary" textAlign="center">
-                            <a href="mailto:dgutyang@gmail.com">Author: Donnie Yang</a>
+                            <a style={{ color: 'white' }} href="mailto:dgutyang@gmail.com">Author: Donnie Yang</a>
                         </Typography>
                     </Box>
                     <CheckboxList />

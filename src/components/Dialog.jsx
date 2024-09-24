@@ -36,6 +36,8 @@ const oriStyle = {
     // bgcolor: 'success.light'
     bgcolor: 'background.paper',
     zIndex: 10001,
+    maxWidth: 500,
+    minWidth: 200,
 };
 
 function Dialog() {
@@ -87,11 +89,14 @@ function Dialog() {
         });
         window.addEventListener('message', async event => {
             const { origin, data } = event;
-            const { key, val } = data;
+            const { key, val, type } = data;
             let keyForMousePressed = USER_SELECT_OPTION_KEY_NONE;
-            if (key !== 'selection' && key !== 'empty') return;
 
-            // console.log('!!!@@@', key, val);
+            if (key !== 'selection' && key !== 'empty') {
+                return;
+            }
+
+            console.log('!!!@@@', key, val, type);
             switch (key) {
                 case 'selection':
                     let { x, y, text } = val;
@@ -201,7 +206,7 @@ function Dialog() {
                     </Tooltip>
                 </Stack>
                 <Typography sx={{ fontSize: '0.7rem', color: 'lightgray' }}>
-                    {"press '+' to add to words page."}
+                    {"press '+' to add characters to your words."}
                 </Typography>
                 <Divider />
                 <Typography sx={{ fontSize: '0.7rem' }}>

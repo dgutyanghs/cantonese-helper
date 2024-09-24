@@ -1,22 +1,13 @@
 import * as React from 'react';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import IconButton from '@mui/material/IconButton';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
-import DeleteIcon from '@mui/icons-material/Delete';
-import { DICT_ITEM_KEY, DICT_ITEM_VAL, DICT_KEY } from '../constant';
-import { Box, Divider, ThemeProvider, Typography } from '@mui/material';
+import { Box, Divider, Typography } from '@mui/material';
 import TTSpeech from '../tts';
 import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
 import MessageBox from './MessageBox';
-import Tooltip from '@mui/material/Tooltip';
-import DownloadIcon from '@mui/icons-material/Download';
 import CSvExport from './CsvExport';
-import { DataGrid, GridFooterContainer, GridToolbarContainer } from '@mui/x-data-grid';
+import { DataGrid } from '@mui/x-data-grid';
+
+import "../css/fonts.css";
 
 
 const columns = [
@@ -24,13 +15,23 @@ const columns = [
     {
         field: 'character',
         headerName: 'Character',
-        width: 200,
+        minWidth: 150,
         editable: false,
+        renderCell: (params) => (
+            <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', height: '100%' }}>
+                <Typography 
+                sx={{ 
+                     fontFamily: 'LXGW WenKai Mono TC, Noto Serif, Consolas'
+                }} >{params.value}</Typography>
+
+            </Box>
+        )
     },
     {
         field: 'jyutping',
         headerName: 'Jyutping',
-        width: 450,
+        minWidth: 220,
+
         editable: false,
         renderCell: (params) => (
             <Stack direction={"row"} spacing={1} alignItems={"center"} sx={{ width: '100%', height: '100%', cursor: 'pointer' }}>
@@ -156,7 +157,7 @@ export default function CheckboxList() {
 
     return (
         (
-            <Box sx={{ height: 600, width: '100%', background: 'linear-gradient(to bottom, lightgrey, darkgrey)' }} >
+            <Box sx={{ height: 600, width: '100%', background: 'linear-gradient(to bottom, white, lightgrey)' }} >
                 <DataGrid
                     rows={rows}
                     columns={columns}
@@ -174,9 +175,9 @@ export default function CheckboxList() {
                     sx={{
                         '& .MuiDataGrid-columnHeaders': {
                             backgroundColor: 'black',
-                            color: 'orange', // optional, to change the text color
+                            color: 'blue', // optional, to change the text color
                             fontSize: '20px',
-                        },
+                        }
                     }}
                 />
                 <Divider />

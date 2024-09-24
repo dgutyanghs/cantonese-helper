@@ -1,7 +1,7 @@
 {
     "name": "__MSG_extensionName__",
     "manifest_version": 3,
-    "version": "2.1.6",
+    "version": "2.1.8",
     "default_locale": "en",
     "description": "__MSG_extensionDescription__",
     "icons": {
@@ -42,11 +42,13 @@
             "resources": [
                 "dictionary.json.txt",
                 "web_accessible_resources.js",
-                "contentScript.css"
+                "contentScript.css",
+                "fonts.css"
             ],
             "matches": [
                 "https://*/*",
-                "http://*/*"
+                "http://*/*",
+                "<all_urls>"
             ]
         }
     ],
@@ -65,6 +67,11 @@
     },
     "options_page": "options.html",
     "host_permissions": [
-        "https://cn.bing.com/dict/"
-    ]
+        "https://cn.bing.com/dict/",
+        "https://fonts.googleapis.com/",
+        "https://fonts.gstatic.com/"
+    ],
+    "content_security_policy": {
+        "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com"
+    }
 }
