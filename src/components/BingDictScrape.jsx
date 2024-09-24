@@ -36,7 +36,7 @@ const BingDictScrape = ({ text, callbackFn }) => {
     }, [text]);
 
     // return <span style={{ color:'grey'}}>{translation}</span>;
-    return <Typography variant='caption' sx={{ color: 'grey', height: '20px' }}>{translation}</Typography>;
+    return <Typography variant='caption' sx={{ color: 'white', height: '20px' }}>{translation}</Typography>;
 };
 
 export default BingDictScrape;

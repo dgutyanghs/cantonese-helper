@@ -31,12 +31,14 @@ import shadows from '@mui/material/styles/shadows.js';
 
 const oriStyle = {
     position: 'absolute',
-    border: '1px solid #AAA',
+    // border: '1px solid #AAA',
     boxShadow: 24,
     p: '0px 20px 20px 20px',
     display: 'none',
     // bgcolor: 'background.paper',
-    background: 'linear-gradient(126deg, rgba(164,205,251,1) 35%, rgba(99,148,252,1) 93%)',
+    // background: 'linear-gradient(126deg, rgba(164,205,251,1)55%, rgba(99,148,252,1) 93%)',
+    // background: rgb(122,180,246);
+    background: 'linear-gradient(126deg, rgba(122,180,246,1) 0%, rgba(99,135,252,1) 85%)',
     zIndex: 10001,
     maxWidth: 500,
     minWidth: 200,
@@ -166,10 +168,10 @@ function Dialog() {
                         let result = await convertText(text);
                         console.log(result);
                         let allText = result.map(e => (
-                            <ruby className="textforjyut" key={nanoid()}>
+                            <ruby className="textforjyut"  key={nanoid()}>
                                 {e[0]}
                                 <rp>(</rp>
-                                <rt className="jyut">{e[1]}</rt>
+                                <rt className="jyut" style={{ fontSize: '0.8em' }}>{e[1]}</rt>
                                 <rp>)</rp>
                             </ruby>
                         ));
