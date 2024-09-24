@@ -7,9 +7,11 @@ import TTSpeech from '../tts.js';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { Divider, IconButton, Stack } from '@mui/material';
-import Tooltip from '@mui/material/Tooltip';
 import AddIcon from '@mui/icons-material/Add';
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
+import ListIcon from '@mui/icons-material/List';
+import CheckIcon from '@mui/icons-material/Check';
+import FormatListBulletedIcon from '@mui/icons-material/FormatListBulleted';
 import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import { ClassSharp, Opacity, Padding } from '@mui/icons-material';
 import { lightBlue } from '@mui/material/colors';
@@ -64,26 +66,6 @@ function Dialog() {
         opacity: isVisible ? 1 : 0,
         // pointerEvents: isVisible ? 'auto' : 'none',
     };
-    // const handleClose = () => {
-    //     const newStyle = {
-    //         ...oriStyle,
-    //         display: 'none',
-    //         opacity: '0',
-    //     };
-    //     setModalStyle(newStyle);
-    //     setTextInWords(false);
-    // };
-    // const handleOpen = pos => {
-    //     const newStyle = {
-    //         ...oriStyle,
-    //         top: `${pos.y}px`,
-    //         left: `${pos.x}px`,
-    //         display: 'block',
-    //         opacity: '1',
-    //     };
-    //     setModalStyle(newStyle);
-    // };
-
     const handleClose = () => {
         setIsVisible(false);
         // setTimeout(() => {
@@ -118,26 +100,24 @@ function Dialog() {
 
 
     React.useEffect(() => {
-        /**
-         * In option.html, user maybe delete all words, when happened, update the wordArray in contentscript.js
-         */
-        // chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-        //     if (request.action === 'updateWordArray') {
-        //         const wordArrayOption = request.data;
-        //         setWordArray(wordArrayOption);
-        //         console.log('get message, wordArray updated:', wordArrayOption);
-        //     }
-        // });
+
+        // get the current state of main switch
 
         window.addEventListener('message', async event => {
             const { origin, data } = event;
             const { key, val, type } = data;
             let keyForMousePressed = USER_SELECT_OPTION_KEY_NONE;
 
-            if (key !== 'selection' && key !== 'empty') {
+
+            if (key !== 'cantonese-helper-selection-DonnieYang' && key !== 'empty') {
                 return;
             }
 
+            // console.log("!!!Dialog useEffect, main switch is ", mainSwitch);
+            // if (mainSwitch === false) {
+            //     console.log("Dialog, main switch is false, return");
+            //     return;
+            // }
             // console.log('!!!@@@', key, val, type);
             switch (key) {
                 case 'selection':
@@ -168,7 +148,7 @@ function Dialog() {
                         let result = await convertText(text);
                         console.log(result);
                         let allText = result.map(e => (
-                            <ruby className="textforjyut"  key={nanoid()}>
+                            <ruby className="textforjyut" key={nanoid()}>
                                 {e[0]}
                                 <rp>(</rp>
                                 <rt className="jyut" style={{ fontSize: '0.8em' }}>{e[1]}</rt>
@@ -193,6 +173,14 @@ function Dialog() {
             }
         });
     }, []);
+    
+
+
+    /** cause can't create a new tab in contentscript.js, use this function to send message to background service, then serviceworker.js open the options page */
+    const gotoOptions = () => {
+        // chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
+        chrome.runtime.sendMessage({ action: 'openOptions' });
+    };
 
     const playSound = () => TTSpeech.getInstance().speakLong(soundText);
     const addToList = () => {
@@ -231,30 +219,32 @@ function Dialog() {
                 <Typography sx={{ fontSize: '0.7rem' }}>
                     <BingDictScrape text={soundText} callbackFn={(text) => setBingTranslateText(text)} />
                 </Typography>
-                <Stack direction={'row'} bgcolor={'darkgray'} spacing={4} justifyContent={'center'}>
-                    <Tooltip title="speak">
-                        <IconButton onClick={playSound} color="primary" aria-label="play sound">
-                            <VolumeUpIcon />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="save">
-                        <IconButton
-                            onClick={addToList}
-                            color={textInWords ? 'secondary' : 'primary'}
-                            data-aug="hello"
-                            aria-label="add word to list"
-                        >
-                            <AddIcon />
-                        </IconButton>
-                    </Tooltip>
+                <Typography sx={{ fontSize: '0.7rem' }}>
+                    <TranslateLink soundText={soundText} />
+                </Typography>
+                <Divider />
+                <Stack direction={'row'} bgcolor={'transparent'} border={'0.5px solid lightgray'} spacing={4} justifyContent={'center'}>
+                    <IconButton onClick={playSound} variant="contained" color="warning" aria-label="play sound">
+                        <VolumeUpIcon />
+                    </IconButton>
+                    <IconButton
+                        onClick={addToList}
+                        color={textInWords ? 'primary' : 'warning'}
+                        data-aug="hello"
+                        aria-label="add word to list"
+                        variant="contained"
+                    >
+                       {textInWords ? <CheckIcon /> : <AddIcon />} 
+                    </IconButton>
+                    <IconButton onClick={gotoOptions} variant="contained" color="warning" aria-label="play sound">
+                        <ListIcon />
+                    </IconButton>
+                    
                 </Stack>
                 <Typography sx={{ fontSize: '0.7rem', color: 'lightgray' }}>
                     {"press '+' to add characters to your words."}
                 </Typography>
                 <Divider />
-                <Typography sx={{ fontSize: '0.7rem' }}>
-                    <TranslateLink soundText={soundText} />
-                </Typography>
             </Box>
         </div>
     );

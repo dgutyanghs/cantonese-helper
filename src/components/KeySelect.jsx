@@ -13,6 +13,19 @@ import {
     USER_SELECT_OPTION_KEY_SHIFT,
 } from '../constant';
 
+// import CustomSelect from './CustomSelect';
+import { styled } from '@mui/system';
+
+const StyledSelectWrapper = styled('div')(({ theme }) => ({
+    '& .MuiNativeSelect-select': {
+        paddingLeft: '10px',
+        // color: '#2196f3',
+    },
+    // '& .MuiNativeSelect-select option:first-of-type': {
+    //     color: 'red',
+    // },
+}));
+
 export default function KeySelect() {
     const [value, setValue] = React.useState(USER_SELECT_OPTION_KEY_NONE);
 
@@ -59,20 +72,22 @@ export default function KeySelect() {
                 <InputLabel variant="standard" htmlFor="uncontrolled-native">
                     Mouse + 'Key' to select text.
                 </InputLabel>
-                <NativeSelect
-                    value={value}
-                    inputProps={{
-                        name: value,
-                        id: 'uncontrolled-native',
-                    }}
-                    onChange={handleChange}
-                    sx={{ color: '#2196f3' }}
-                >
-                    <option value={USER_SELECT_OPTION_KEY_NONE}>none key</option>
-                    <option value={USER_SELECT_OPTION_KEY_CTL}>ctl</option>
-                    <option value={USER_SELECT_OPTION_KEY_ALT}>alt</option>
-                    <option value={USER_SELECT_OPTION_KEY_SHIFT}>shift</option>
-                </NativeSelect>
+                <StyledSelectWrapper>
+                    <NativeSelect
+                        value={value}
+                        inputProps={{
+                            name: value,
+                            id: 'uncontrolled-native',
+                        }}
+                        onChange={handleChange}
+                        sx={{ color: '#2196f3' , mt: '15px'}}
+                    >
+                        <option value={USER_SELECT_OPTION_KEY_NONE}>mouse only</option>
+                        <option value={USER_SELECT_OPTION_KEY_CTL}> mouse + ctl</option>
+                        <option value={USER_SELECT_OPTION_KEY_ALT}> mouse + alt</option>
+                        <option value={USER_SELECT_OPTION_KEY_SHIFT}> mouse + shift</option>
+                    </NativeSelect>
+                </StyledSelectWrapper>
             </FormControl>
         </Box>
     );

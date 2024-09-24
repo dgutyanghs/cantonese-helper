@@ -21,12 +21,15 @@ const injectScriptToPage = async () => {
     console.log('注入 web_accessible_resources.js 完成');
 };
 
-const injectDOM = async () => {
+const injectDOM = async (isToggled) => {
+
     const container = document.createElement('div');
     container.id = 'jyutpingwonderful-container';
     document.body.appendChild(container);
 
+    console.log('injectDOM, isToggled=', isToggled);
     createRoot(container).render(<Dialog />);
+    // createRoot(container).render(<Dialog mainSwitch={isToggled} />);
     console.log('injectDOM finished');
 };
 
@@ -88,17 +91,23 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 const init = async () => {
     //check ON or OFF switch in popup.html .
-    const isON = await getSwitchState(SWITCH_POPUP);
-    if (!isON) {
-        console.log('contentscript, switch_popup isON =', isON);
-        return;
-    } else {
-        console.log('contentscript, isOn=', isON)
-    }
+    // const isON = await getSwitchState(SWITCH_POPUP);
+    // if (!isON) {
+    //     console.log('contentscript, switch_popup isON =', isON);
+    //     return;
+    // } else {
+    //     console.log('contentscript, isOn=', isON)
+    // }
+
+    let isToggled = true;
+    await chrome.storage.local.get(['isToggled'], (result) => {
+        console.log("injectDOM, isToggled=", result.isToggled);
+        isToggled = result.isToggled || false;
+    });
 
     keyForMouseSelected = await getKeyForMouseSelected(MOUSE_AND_KEY);
     await injectScriptToPage();
-    await injectDOM();
+    await injectDOM(isToggled);
     console.log('contentSrcipts init, keyForMouseSelected =', keyForMouseSelected);
 };
 

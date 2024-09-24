@@ -27,6 +27,54 @@ function convert(t, s) {
     return res;
 }
 
+/**
+ * for main switch in popup.html
+ */
+function updateExtensionIcon(isOn) {
+    const iconPaths = isOn
+        ? {
+            "48":  "icons/48.png",
+            "96":  "icons/96.png",
+            "128": "icons/128.png"
+        }
+        : {
+            "48":  "icons/off48.png",
+            "96":  "icons/off96.png",
+            "128": "icons/off128.png"
+        };
+
+    // For Manifest V3
+    if (chrome.action) {
+        chrome.action.setIcon({ path: iconPaths });
+    }
+}
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'updateIcon') {
+        updateExtensionIcon(message.isOn);
+    }
+});
+
+// Also update the icon when the extension starts
+chrome.storage.local.get(['isToggled'], (result) => {
+    updateExtensionIcon(result.isToggled || false);
+});
+
+/**
+ * Open options page in new tab when user clicks on the Dialog.jsx
+ */
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.action === 'openOptions') {
+        console.log("serviceWorker, open Options page");
+        chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
+    }
+    return false;
+});
+
+/**
+ * Fetch translation
+ * @param {String}  text to be translated
+ * @return {Promise} Promise object，translated result
+ */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'fetchTranslation') {
         fetchTranslation(request.text)
@@ -41,6 +89,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 // Listen for messages from content script or options page
+/**
+ * for indexedDB 
+ */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'add') {
         try {
@@ -128,11 +179,11 @@ chrome.runtime.onInstalled.addListener(function () {
 
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "cantonese-menu-item") {
-    console.log("Context menu item clicked!");
-    // Add your functionality here
-    chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
-  }
+    if (info.menuItemId === "cantonese-menu-item") {
+        console.log("Context menu item clicked!");
+        // Add your functionality here
+        chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
+    }
 });
 
 /**

@@ -38,5 +38,5 @@ const handleSelection = event => {
         shiftKey: event.shiftKey 
     };
     console.log('sendMessage2', selectionData);
-    sendMessage2('selection', selectionData);
+    sendMessage2('cantonese-helper-selection-DonnieYang', selectionData);
 };
