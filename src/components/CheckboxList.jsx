@@ -8,6 +8,8 @@ import CSvExport from './CsvExport';
 import { DataGrid } from '@mui/x-data-grid';
 
 import "../css/fonts.css";
+import Tips from './Tips';
+import BuyMeACoffee from './BuyMeACoffee';
 
 
 const columns = [
@@ -157,7 +159,7 @@ export default function CheckboxList() {
 
     return (
         (
-            <Box sx={{ height: 600, width: '100%', background: 'linear-gradient(to bottom, white, lightgrey)' }} >
+            <Box sx={{ height: 550, width: '100%', background: 'linear-gradient(to bottom, white, lightgrey)' }} >
                 <DataGrid
                     rows={rows}
                     columns={columns}
@@ -181,10 +183,12 @@ export default function CheckboxList() {
                     }}
                 />
                 <Divider />
+                <Tips />
 
                 <Stack mr="10px" my="10px" direction="row" justifyContent="flex-start" spacing="40px">
                     <MessageBox rows={selectedRows} onDataUpdate={handleMessageBoxCallback}></MessageBox>
                     <CSvExport data={rows} />
+                    <BuyMeACoffee />
                 </Stack>
             </Box>
         )
