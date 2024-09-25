@@ -64,7 +64,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Also update the icon when the extension starts
 chrome.storage.local.get(['isToggled'], (result) => {
-    updateExtensionIcon(result.isToggled || false);
+    if (result.isToggled === undefined) {
+        console.log("serviceWorker, isToggled is undefined, set to true");
+        const isOn = true;
+        chrome.storage.local.set({ isToggled: isOn }, () => {
+            console.log("serviceWorker, isToggled save to storage success", isOn);
+            updateExtensionIcon(isOn);
+        });
+        // updateExtensionIcon(isOn);
+    } else {
+        const isOn = result.isToggled;
+        updateExtensionIcon(isOn);
+    }
 });
 
 /**

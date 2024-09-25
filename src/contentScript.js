@@ -99,15 +99,22 @@ const init = async () => {
     //     console.log('contentscript, isOn=', isON)
     // }
 
-    let isToggled = true;
-    await chrome.storage.local.get(['isToggled'], (result) => {
-        console.log("injectDOM, isToggled=", result.isToggled);
-        isToggled = result.isToggled || false;
-    });
+    // let isToggled = true;
+    // await chrome.storage.local.get(['isToggled'], (result) => {
+    //     console.log("injectDOM, isToggled=", result.isToggled);
+    //     if (result.isToggled === undefined) {
+    //         console.log("injectDOM, isToggled is undefined, set to true");
+    //         isToggled = true;
+    //         chrome.storage.local.set({ isToggled });
+    //     } else {
+    //         isToggled = result.isToggled;
+    //         console.log("injectDOM, result.isToggled=", result.isToggled);
+    //     }
+    // });
 
     keyForMouseSelected = await getKeyForMouseSelected(MOUSE_AND_KEY);
     await injectScriptToPage();
-    await injectDOM(isToggled);
+    await injectDOM(true);
     console.log('contentSrcipts init, keyForMouseSelected =', keyForMouseSelected);
 };
 

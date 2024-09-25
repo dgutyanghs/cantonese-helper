@@ -11,16 +11,6 @@ import SendIcon from '@mui/icons-material/Send';
 function App() {
     const [isToggled, setIsToggled] = React.useState(true); // main switch
 
-    // const handleSwitch2 = e => {
-    //     const isToggled = e.target.checked;
-    //     console.log('isToggle=', isToggled);
-    //     setIsToggled(isToggled);
-    //     const data = { [SWITCH_POPUP]: isToggled };
-    //     chrome.storage.sync.set(data, () => {
-    //         console.log('SWITCH_POPUP is saved:', data);
-    //     });
-    // };
-
     const handleSwitch = (event) => {
         const newState = event.target.checked;
         setIsToggled(newState);
@@ -34,22 +24,17 @@ function App() {
 
 
     useEffect(() => {
+        // let isToggled = true;
         chrome.storage.local.get(['isToggled'], (result) => {
-            setIsToggled(result.isToggled || false);
+            if (result.isToggled === undefined) { //first time
+                console.log("popup.js, isToggled is undefined, set to true");
+                setIsToggled(true);
+            } else {
+                const isToggled = result.isToggled;
+                console.log("popup.js, result.isToggled=", isToggled);
+                setIsToggled(isToggled);
+            }
         });
-        // let key = [SWITCH_POPUP];
-        // chrome.storage.sync.get(key, result => {
-        //     console.log('SWITCH_POPUP state: ', result);
-        //     const isON = result[SWITCH_POPUP];
-        //     if (isON !== undefined) {
-        //         console.log('isON not a undefined ', isON)
-        //         setIsToggled(isON);
-        //     } else {
-        //         //first time, default On
-        //         console.log('isON is undefined ', isON)
-        //         setIsToggled(true);
-        //     }
-        // });
     }, []);
     const gotoOptions = () => {
         chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
