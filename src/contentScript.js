@@ -28,8 +28,8 @@ const injectDOM = async (isToggled) => {
     document.body.appendChild(container);
 
     console.log('injectDOM, isToggled=', isToggled);
-    createRoot(container).render(<Dialog />);
-    // createRoot(container).render(<Dialog mainSwitch={isToggled} />);
+    // createRoot(container).render(<Dialog />);
+    createRoot(container).render(<Dialog mainSwitch={isToggled} />);
     console.log('injectDOM finished');
 };
 

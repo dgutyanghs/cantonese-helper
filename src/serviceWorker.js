@@ -29,17 +29,18 @@ function convert(t, s) {
 
 /**
  * for main switch in popup.html
+ * update extension icon
  */
 function updateExtensionIcon(isOn) {
     const iconPaths = isOn
         ? {
-            "48":  "icons/48.png",
-            "96":  "icons/96.png",
+            "48": "icons/48.png",
+            "96": "icons/96.png",
             "128": "icons/128.png"
         }
         : {
-            "48":  "icons/off48.png",
-            "96":  "icons/off96.png",
+            "48": "icons/off48.png",
+            "96": "icons/off96.png",
             "128": "icons/off128.png"
         };
 
@@ -50,7 +51,14 @@ function updateExtensionIcon(isOn) {
 }
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'updateIcon') {
+        console.log("serviceWorker received message, updateIcon");
         updateExtensionIcon(message.isOn);
+        // Forward the message to all tabs
+        chrome.tabs.query({}, (tabs) => {
+            tabs.forEach(tab => {
+                chrome.tabs.sendMessage(tab.id, { action: 'updateIcon', isOn: message.isOn });
+            });
+        });
     }
 });
 

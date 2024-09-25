@@ -27,8 +27,6 @@ import {
 import TranslateLink from './TranslateLink';
 import BingDictScrape from './BingDictScrape';
 import { keyForMouseSelected } from '../contentScript.js';
-import shadows from '@mui/material/styles/shadows.js';
-// import { myDatabase } from '../database.js';
 
 
 const oriStyle = {
@@ -51,12 +49,13 @@ const oriStyle = {
     // pointerEvents: 'none',
 };
 
-function Dialog() {
+function Dialog({ mainSwitch }) {
+    const messageListenerRef = useRef(null);
+    const [localSwitch, setLocalSwitch] = React.useState(mainSwitch);
     const [allText, setAllText] = React.useState(' ');
     const [soundText, setSoundText] = React.useState('你好');
     const [modalStyle, setModalStyle] = React.useState(oriStyle);
     const [covertResult, setCovertResult] = React.useState([]);
-    // const [wordArray, setWordArray] = React.useState([]);
     const [textInWords, setTextInWords] = React.useState(false); // user add this text or not
     const [bingTranslateText, setBingTranslateText] = React.useState("");
     const [isVisible, setIsVisible] = React.useState(false); // for animation of dialog
@@ -64,7 +63,6 @@ function Dialog() {
     const currentStyle = {
         ...modalStyle,
         opacity: isVisible ? 1 : 0,
-        // pointerEvents: isVisible ? 'auto' : 'none',
     };
     const handleClose = () => {
         setIsVisible(false);
@@ -99,10 +97,24 @@ function Dialog() {
     }
 
 
+
+    /**
+     * when main switch is changed, it will update the icon, and listen for messages from background
+     * msg flow: popup.html -> background.js -> contentScript.js
+     */
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.action === 'updateIcon') {
+            // Handle the updateIcon message here
+            console.log('Received updateIcon message:', message.isOn);
+            const newLocalSwitch = message.isOn;
+            setLocalSwitch(newLocalSwitch);
+        }
+    });
+
     React.useEffect(() => {
 
         // get the current state of main switch
-
+        // listen for messages from content scripts, when mainswitch is changed, it will update the icon
         window.addEventListener('message', async event => {
             const { origin, data } = event;
             const { key, val, type } = data;
@@ -114,13 +126,16 @@ function Dialog() {
             }
 
             // console.log("!!!Dialog useEffect, main switch is ", mainSwitch);
-            // if (mainSwitch === false) {
-            //     console.log("Dialog, main switch is false, return");
-            //     return;
-            // }
-            // console.log('!!!@@@', key, val, type);
+            console.log("!!!Dialog local switch=", localSwitch);
+            if (localSwitch === false) {
+                console.log("Dialog, local switch is false, return");
+                return;
+            }
+
+            // console.log('!!!@@@key, val, type, localSwitch', key, val, type, localSwitch);
+            console.log("Dialog, local switch=", localSwitch);
             switch (key) {
-                case 'selection':
+                case 'cantonese-helper-selection-DonnieYang':
                     let { x, y, text } = val;
                     let { ctrlKey, altKey, shiftKey } = val;
                     // console.log('selection, x,y', x, y);
@@ -172,8 +187,8 @@ function Dialog() {
                     break;
             }
         });
-    }, []);
-    
+    }, [localSwitch]);
+
 
 
     /** cause can't create a new tab in contentscript.js, use this function to send message to background service, then serviceworker.js open the options page */
@@ -209,7 +224,7 @@ function Dialog() {
 
     const stopPassTheEvent = e => e.stopPropagation();
     return (
-        <div id="jyutpingpopupdialogid">
+        <Box id="jyutpingpopupdialogid">
             {/* <Box onMouseUp={stopPassTheEvent} sx={modalStyle}> */}
             <Box onMouseUp={stopPassTheEvent} sx={currentStyle}>
                 <Typography variant='h5' sx={{ mt: 2, color: 'white' }}>
@@ -219,10 +234,12 @@ function Dialog() {
                 <Typography sx={{ fontSize: '0.7rem' }}>
                     <BingDictScrape text={soundText} callbackFn={(text) => setBingTranslateText(text)} />
                 </Typography>
-                <Typography sx={{ fontSize: '0.7rem' }}>
+                {/* <Divider  /> */}
+                {/* <hr /> */}
+                <Typography sx={{ fontSize: '0.7rem' }} component={'div'}>
                     <TranslateLink soundText={soundText} />
                 </Typography>
-                <Divider />
+                {/* <Divider /> */}
                 <Stack direction={'row'} bgcolor={'transparent'} border={'0.5px solid lightgray'} spacing={4} justifyContent={'center'}>
                     <IconButton onClick={playSound} variant="contained" color="warning" aria-label="play sound">
                         <VolumeUpIcon />
@@ -234,19 +251,20 @@ function Dialog() {
                         aria-label="add word to list"
                         variant="contained"
                     >
-                       {textInWords ? <CheckIcon /> : <AddIcon />} 
+                        {textInWords ? <CheckIcon /> : <AddIcon />}
                     </IconButton>
                     <IconButton onClick={gotoOptions} variant="contained" color="warning" aria-label="play sound">
                         <ListIcon />
                     </IconButton>
-                    
+
                 </Stack>
                 <Typography sx={{ fontSize: '0.7rem', color: 'lightgray' }}>
                     {"press '+' to add characters to your words."}
                 </Typography>
-                <Divider />
+                <hr />
+                {/* <Divider /> */}
             </Box>
-        </div>
+        </Box>
     );
 }
 

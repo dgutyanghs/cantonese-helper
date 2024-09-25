@@ -8,12 +8,12 @@ const TranslateLink = ({ soundText }) => {
 
   return (
     <Box>
-      <Typography variant="caption" color={'white'}> Google: 
+      <Typography variant="caption" color={'white'} component={'span'}> Google: 
         <a
           href={`https://translate.google.com/?sl=auto&tl=en&text=${encodeURIComponent(soundText)}&op=translate`}
           target="_blank"
           rel="noopener noreferrer"
-          style={{ color: theme.palette.warning.main }}
+          style={{ color: theme.palette.warning.main, fontWeight: 'bold', marginLeft: '5px' }}
         >{soundText}
         </a>
       </Typography>
