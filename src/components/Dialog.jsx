@@ -107,6 +107,9 @@ function Dialog({ mainSwitch }) {
             // Handle the updateIcon message here
             console.log('Received updateIcon message:', message.isOn);
             const newLocalSwitch = message.isOn;
+            if (newLocalSwitch === false) {
+                handleClose();
+            }
             setLocalSwitch(newLocalSwitch);
             // if (newLocalSwitch === false ) {
             //     handleClose();

@@ -24,6 +24,10 @@ function App() {
 
 
     useEffect(() => {
+        // for test local storage only
+        chrome.storage.local.set({ A: 'Hello from popup.js' }, () => {
+            console.log('A Value stored in local storage');
+        });
         // let isToggled = true;
         chrome.storage.local.get(['isToggled'], (result) => {
             if (result.isToggled === undefined) { //first time
