@@ -133,14 +133,14 @@ function Dialog({ mainSwitch }) {
             }
 
             // console.log("!!!Dialog useEffect, main switch is ", mainSwitch);
-            console.log("!!!Dialog local switch=", localSwitch);
+            // console.log("!!!Dialog local switch=", localSwitch);
             if (localSwitch === false) {
                 console.log("Dialog, local switch is false, return");
                 return;
             }
 
             // console.log('!!!@@@key, val, type, localSwitch', key, val, type, localSwitch);
-            console.log("Dialog, local switch=", localSwitch);
+            // console.log("Dialog, local switch=", localSwitch);
             switch (key) {
                 case 'cantonese-helper-selection-DonnieYang':
                     let { x, y, text } = val;

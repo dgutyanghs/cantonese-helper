@@ -48,14 +48,17 @@ export default function KeySelect() {
         setValue(value);
         const data = { [MOUSE_AND_KEY]: value };
         notifyContentScript(value);
-        chrome.storage.sync.set(data, () => {
+        chrome.storage.local.set(data, () => {
             console.log('MOUSE_AND_KEY is saved', data);
-        });
+        })
+        // chrome.storage.sync.set(data, () => {
+        //     console.log('MOUSE_AND_KEY is saved', data);
+        // });
     };
 
     React.useEffect(() => {
         const key = MOUSE_AND_KEY;
-        chrome.storage.sync.get(key, result => {
+        chrome.storage.local.get(key, result => {
             const value = result[key];
             console.log('MOUSE_AND_KEY result,value', result, value);
             if (value === null || value === undefined || value === 'none') {
@@ -63,7 +66,16 @@ export default function KeySelect() {
             } else {
                 setValue(value);
             }
-        });
+        })
+        // chrome.storage.sync.get(key, result => {
+        //     const value = result[key];
+        //     console.log('MOUSE_AND_KEY result,value', result, value);
+        //     if (value === null || value === undefined || value === 'none') {
+        //         setValue('none');
+        //     } else {
+        //         setValue(value);
+        //     }
+        // });
     }, []);
 
     return (

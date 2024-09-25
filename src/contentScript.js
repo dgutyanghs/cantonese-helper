@@ -35,7 +35,7 @@ const injectDOM = async (isToggled) => {
 
 function getKeyForMouseSelected(key) {
     return new Promise((reslove, reject) => {
-        chrome.storage.sync.get(key, function (result) {
+        chrome.storage.local.get(key, function (result) {
             if (chrome.runtime.lastError) {
                 reject(new Error(chrome.runtime.lastError.message));
             } else {
@@ -50,21 +50,21 @@ function getKeyForMouseSelected(key) {
 }
 
 
-function getSwitchState(key) {
-    return new Promise((reslove, reject) => {
-        chrome.storage.sync.get(key, function (result) {
-            if (chrome.runtime.lastError) {
-                reject(new Error(chrome.runtime.lastError.message));
-            } else {
-                if (result[key] === undefined) {
-                    reslove(true);
-                } else {
-                    reslove(result[key]);
-                }
-            }
-        });
-    });
-}
+// function getSwitchState(key) {
+//     return new Promise((reslove, reject) => {
+//         chrome.storage.local.get(key, function (result) {
+//             if (chrome.runtime.lastError) {
+//                 reject(new Error(chrome.runtime.lastError.message));
+//             } else {
+//                 if (result[key] === undefined) {
+//                     reslove(true);
+//                 } else {
+//                     reslove(result[key]);
+//                 }
+//             }
+//         });
+//     });
+// }
 
 let port;
 let msgManager;
