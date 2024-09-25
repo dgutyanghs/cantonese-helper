@@ -50,7 +50,7 @@ const oriStyle = {
 };
 
 function Dialog({ mainSwitch }) {
-    const messageListenerRef = useRef(null);
+    const messageListenerRef = React.useRef(null);
     const [localSwitch, setLocalSwitch] = React.useState(mainSwitch);
     const [allText, setAllText] = React.useState(' ');
     const [soundText, setSoundText] = React.useState('你好');
@@ -108,6 +108,9 @@ function Dialog({ mainSwitch }) {
             console.log('Received updateIcon message:', message.isOn);
             const newLocalSwitch = message.isOn;
             setLocalSwitch(newLocalSwitch);
+            // if (newLocalSwitch === false ) {
+            //     handleClose();
+            // }
         }
     });
 
@@ -115,7 +118,8 @@ function Dialog({ mainSwitch }) {
 
         // get the current state of main switch
         // listen for messages from content scripts, when mainswitch is changed, it will update the icon
-        window.addEventListener('message', async event => {
+        const listener = async (event) => {
+            // Your listener code here
             const { origin, data } = event;
             const { key, val, type } = data;
             let keyForMousePressed = USER_SELECT_OPTION_KEY_NONE;
@@ -186,7 +190,15 @@ function Dialog({ mainSwitch }) {
                 default:
                     break;
             }
-        });
+        };
+        messageListenerRef.current = listener;
+        window.addEventListener('message', listener);
+
+        return () => {
+            window.removeEventListener('message', listener);
+            messageListenerRef.current = null;
+            console.log("!!!@@Dialog, remove listener");
+        }
     }, [localSwitch]);
 
 
