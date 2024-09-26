@@ -90,31 +90,24 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 
 
 const init = async () => {
-    //check ON or OFF switch in popup.html .
-    // const isON = await getSwitchState(SWITCH_POPUP);
-    // if (!isON) {
-    //     console.log('contentscript, switch_popup isON =', isON);
-    //     return;
-    // } else {
-    //     console.log('contentscript, isOn=', isON)
-    // }
-
-    // let isToggled = true;
-    // await chrome.storage.local.get(['isToggled'], (result) => {
-    //     console.log("injectDOM, isToggled=", result.isToggled);
-    //     if (result.isToggled === undefined) {
-    //         console.log("injectDOM, isToggled is undefined, set to true");
-    //         isToggled = true;
-    //         chrome.storage.local.set({ isToggled });
-    //     } else {
-    //         isToggled = result.isToggled;
-    //         console.log("injectDOM, result.isToggled=", result.isToggled);
-    //     }
-    // });
+    //check main switch in popup.html .
+    let isToggled = false;
+    await chrome.storage.local.get(['isToggled'], (result) => {
+        // console.log("injectDOM, isToggled=", result.isToggled);
+        if (result.isToggled === undefined) {
+            /* isToggled === undefined won't happen in content script, it will only happen in background.js */
+            console.log("injectDOM, isToggled is undefined, set to true");
+            isToggled = true;
+            chrome.storage.local.set({ isToggled });
+        } else {
+            isToggled = result.isToggled;
+            console.log("injectDOM, not first time, result.isToggled=", result.isToggled);
+        }
+    });
 
     keyForMouseSelected = await getKeyForMouseSelected(MOUSE_AND_KEY);
     await injectScriptToPage();
-    await injectDOM(true);
+    await injectDOM(isToggled);
     console.log('contentSrcipts init, keyForMouseSelected =', keyForMouseSelected);
 };
 
