@@ -4,11 +4,11 @@
 
 ## 在Chrome Web Store & Edge Add-ons
 
-![Logo]（./chrome%20web%20store.png）
-為 Google Chrome 安裝 [粵語助手]（https://chromewebstore.google.com/detail/cantonese-helper/jfincemdopkabfjdjbhekkblihbbpdpn）
-為 Microsoft Edge 安裝 [粵語助手]（https://microsoftedge.microsoft.com/addons/detail/cantonese-helper/ldhnncmfnklohgpaiodacgakciiaddai）
+![Logo](./chrome%20web%20store.png)
+* 為 Google Chrome 安裝 [粵語助手](https://chromewebstore.google.com/detail/cantonese-helper/jfincemdopkabfjdjbhekkblihbbpdpn)
+* 為 Microsoft Edge 安裝 [粵語助手](https://microsoftedge.microsoft.com/addons/detail/cantonese-helper/ldhnncmfnklohgpaiodacgakciiaddai)
 
-**您可以在 Releases 部分下載它並手動載入它。
+* 您可以在 Releases 部分下載它並手動載入它。
 ### introduce
    * “Cantonese Helper” 是幫助人們學習粵語的extension。它使用 Jyutping 的風格來說話和閱讀，這是新手最簡單的方法。
 
