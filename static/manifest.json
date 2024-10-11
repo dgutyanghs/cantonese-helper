@@ -11,15 +11,9 @@
     },
     "content_scripts": [
         {
-            "matches": [
-                "<all_urls>"
-            ],
-            "js": [
-                "contentScript.js"
-            ],
-            "css": [
-                "./css/contentScript.css"
-            ],
+            "matches": ["<all_urls>"],
+            "js": ["contentScript.js"],
+            "css": ["./css/contentScript.css"],
             "all_frames": false,
             "run_at": "document_end"
         }
@@ -27,12 +21,7 @@
     "background": {
         "service_worker": "serviceWorker.js"
     },
-    "permissions": [
-        "storage",
-        "tts",
-        "contextMenus",
-        "tabs"
-    ],
+    "permissions": ["storage", "tts", "contextMenus", "tabs"],
     "action": {
         "default_icon": "icons/96.png",
         "default_title": "__MSG_extensionName__",
@@ -40,17 +29,8 @@
     },
     "web_accessible_resources": [
         {
-            "resources": [
-                "dictionary.json.txt",
-                "web_accessible_resources.js",
-                "contentScript.css",
-                "fonts.css"
-            ],
-            "matches": [
-                "https://*/*",
-                "http://*/*",
-                "<all_urls>"
-            ]
+            "resources": ["dictionary.json.txt", "web_accessible_resources.js", "contentScript.css", "fonts.css"],
+            "matches": ["https://*/*", "http://*/*", "<all_urls>"]
         }
     ],
     "tts_engine": {
@@ -58,18 +38,13 @@
             {
                 "voice_name": "Cantonese Voice",
                 "lang": "yue-Hant-HK",
-                "event_types": [
-                    "start",
-                    "marker",
-                    "end"
-                ]
+                "event_types": ["start", "marker", "end"]
             }
         ]
     },
     "options_page": "options.html",
-    "host_permissions": [
-        "https://cn.bing.com/dict/",
-        "https://fonts.googleapis.com/",
-        "https://fonts.gstatic.com/"
-    ]
+    "options_ui": {
+        "open_in_tab": false
+    },
+    "host_permissions": ["https://cn.bing.com/dict/", "https://fonts.googleapis.com/", "https://fonts.gstatic.com/"]
 }

@@ -27,6 +27,23 @@ function convert(t, s) {
     return res;
 }
 
+/** when extension installed, log it */
+chrome.runtime.onInstalled.addListener(details => {
+    if (details.reason === 'install') {
+        console.log('Installed background script!');
+    }
+});
+
+chrome.runtime.onInstalled.addListener(details => {
+    if (details.reason === 'update') {
+        console.log('Updated background script!');
+    }
+});
+/** when extension updated, log it */
+// chrome.runtime.onUpdated.addListener((object) => {
+//     console.log("Updated background script!");
+// });
+
 /**
  * for main switch in popup.html
  * update extension icon
@@ -34,15 +51,15 @@ function convert(t, s) {
 function updateExtensionIcon(isOn) {
     const iconPaths = isOn
         ? {
-            "48": "icons/48.png",
-            "96": "icons/96.png",
-            "128": "icons/128.png"
-        }
+              48: 'icons/48.png',
+              96: 'icons/96.png',
+              128: 'icons/128.png',
+          }
         : {
-            "48": "icons/off48.png",
-            "96": "icons/off96.png",
-            "128": "icons/off128.png"
-        };
+              48: 'icons/off48.png',
+              96: 'icons/off96.png',
+              128: 'icons/off128.png',
+          };
 
     // For Manifest V3
     if (chrome.action) {
@@ -51,10 +68,10 @@ function updateExtensionIcon(isOn) {
 }
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'updateIcon') {
-        console.log("serviceWorker received message, updateIcon");
+        console.log('serviceWorker received message, updateIcon');
         updateExtensionIcon(message.isOn);
         // Forward the message to all tabs
-        chrome.tabs.query({}, (tabs) => {
+        chrome.tabs.query({}, tabs => {
             tabs.forEach(tab => {
                 chrome.tabs.sendMessage(tab.id, { action: 'updateIcon', isOn: message.isOn });
             });
@@ -63,12 +80,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 // Also update the icon when the extension starts
-chrome.storage.local.get(['isToggled'], (result) => {
+chrome.storage.local.get(['isToggled'], result => {
     if (result.isToggled === undefined) {
-        console.log("serviceWorker, isToggled is undefined, set to true");
+        console.log('serviceWorker, isToggled is undefined, set to true');
         const isOn = true;
         chrome.storage.local.set({ isToggled: isOn }, () => {
-            console.log("serviceWorker, isToggled save to storage success", isOn);
+            console.log('serviceWorker, isToggled save to storage success', isOn);
             updateExtensionIcon(isOn);
         });
         // updateExtensionIcon(isOn);
@@ -83,7 +100,7 @@ chrome.storage.local.get(['isToggled'], (result) => {
  */
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.action === 'openOptions') {
-        console.log("serviceWorker, open Options page");
+        console.log('serviceWorker, open Options page');
         chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
     }
     return false;
@@ -109,7 +126,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 // Listen for messages from content script or options page
 /**
- * for indexedDB 
+ * for indexedDB
  */
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'add') {
@@ -190,16 +207,15 @@ async function fetchTranslation(text) {
 // for menu context
 chrome.runtime.onInstalled.addListener(function () {
     chrome.contextMenus.create({
-        "id": "cantonese-menu-item",
-        "title": "Go to Words Page",
-        "contexts": ["all"]
+        id: 'cantonese-menu-item',
+        title: 'Go to Words Page',
+        contexts: ['all'],
     });
 });
 
-
 chrome.contextMenus.onClicked.addListener((info, tab) => {
-    if (info.menuItemId === "cantonese-menu-item") {
-        console.log("Context menu item clicked!");
+    if (info.menuItemId === 'cantonese-menu-item') {
+        console.log('Context menu item clicked!');
         // Add your functionality here
         chrome.tabs.create({ url: chrome.runtime.getURL('options.html') });
     }
